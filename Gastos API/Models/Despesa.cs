@@ -14,7 +14,8 @@ namespace Gastos_API.Models
         public int Mes { get; set; }
         [Column("ano")]
         public int Ano { get; set; }
-        public List<DespesaItem> Itens { get; set; }
+        public List<DespesaItem> ItensDespesa { get; set; }
+        public List<EntradaItem> ItensEntrada { get; set; }
     }
 
 }

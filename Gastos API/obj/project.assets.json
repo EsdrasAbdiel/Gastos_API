@@ -2269,11 +2269,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Documentos\\Gastos API\\Gastos API\\Gastos API.csproj",
+      "projectUniqueName": "C:\\APIs\\Gastos API\\Gastos API.csproj",
       "projectName": "Gastos API",
-      "projectPath": "C:\\Documentos\\Gastos API\\Gastos API\\Gastos API.csproj",
+      "projectPath": "C:\\APIs\\Gastos API\\Gastos API.csproj",
       "packagesPath": "C:\\Users\\esdio01\\.nuget\\packages\\",
-      "outputPath": "C:\\Documentos\\Gastos API\\Gastos API\\obj\\",
+      "outputPath": "C:\\APIs\\Gastos API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2287,8 +2287,9 @@
         "net8.0"
       ],
       "sources": {
-        "Https://tfs.fagrontechnologies.com.br/tfs/FagronTechnologiesBR/_packaging/FagronTech/nuget/v3/index.json": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://pkgs.dev.azure.com/fagrontech/_packaging/FagronTech/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
@@ -2349,13 +2350,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Ocorreu um erro ao obter os dados de vulnerabilidade do pacote: Não é possível carregar o índice de serviço para a origem Https://tfs.fagrontechnologies.com.br/tfs/FagronTechnologiesBR/_packaging/FagronTech/nuget/v3/index.json."
-    }
-  ]
+  }
 }

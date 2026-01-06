@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9tauFk6za3g=",
+  "dgSpecHash": "ELao7cKB+oQ=",
   "success": true,
-  "projectFilePath": "C:\\Documentos\\Gastos API\\Gastos API\\Gastos API.csproj",
+  "projectFilePath": "C:\\APIs\\Gastos API\\Gastos API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\esdio01\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\esdio01\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
@@ -45,15 +45,5 @@
     "C:\\Users\\esdio01\\.nuget\\packages\\system.text.json\\8.0.4\\system.text.json.8.0.4.nupkg.sha512",
     "C:\\Users\\esdio01\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Ocorreu um erro ao obter os dados de vulnerabilidade do pacote: Não é possível carregar o índice de serviço para a origem Https://tfs.fagrontechnologies.com.br/tfs/FagronTechnologiesBR/_packaging/FagronTech/nuget/v3/index.json.",
-      "projectPath": "C:\\Documentos\\Gastos API\\Gastos API\\Gastos API.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Documentos\\Gastos API\\Gastos API\\Gastos API.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }

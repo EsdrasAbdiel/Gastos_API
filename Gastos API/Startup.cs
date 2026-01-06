@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Gastos_API.Data;
+using Gastos_API.Services;
+using Gastos_API.Repositorios;
 
 namespace Gastos_API
 {
@@ -36,6 +38,8 @@ namespace Gastos_API
             services.AddDbContext<AppDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
+
+            services.AddScoped<IDespesaService, DespesaRepository>();
         }
 
         // ========================================
