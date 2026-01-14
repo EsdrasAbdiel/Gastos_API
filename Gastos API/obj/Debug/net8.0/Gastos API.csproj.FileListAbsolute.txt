@@ -105,7 +105,6 @@ C:\Documentos\Gastos API\Gastos API\obj\Debug\net8.0\Gastos API.genruntimeconfig
 C:\Documentos\Gastos API\Gastos API\obj\Debug\net8.0\ref\Gastos API.dll
 C:\APIs\Gastos API\bin\Debug\net8.0\appsettings.Development.json
 C:\APIs\Gastos API\bin\Debug\net8.0\appsettings.json
-C:\APIs\Gastos API\bin\Debug\net8.0\Gastos API.staticwebassets.runtime.json
 C:\APIs\Gastos API\bin\Debug\net8.0\Gastos API.staticwebassets.endpoints.json
 C:\APIs\Gastos API\bin\Debug\net8.0\Gastos API.exe
 C:\APIs\Gastos API\bin\Debug\net8.0\Gastos API.deps.json
@@ -202,7 +201,6 @@ C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.build.json
 C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.development.json
 C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\APIs\Gastos API\obj\Debug\net8.0\Gastos API.csproj.Up2Date
 C:\APIs\Gastos API\obj\Debug\net8.0\Gastos API.dll
 C:\APIs\Gastos API\obj\Debug\net8.0\refint\Gastos API.dll

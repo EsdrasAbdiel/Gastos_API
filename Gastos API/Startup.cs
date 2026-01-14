@@ -1,13 +1,14 @@
+using Gastos_API.Data;
+using Gastos_API.Interfaces;
+using Gastos_API.Repositorios;
+using Gastos_API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Gastos_API.Data;
-using Gastos_API.Services;
-using Gastos_API.Repositorios;
 
 namespace Gastos_API
 {
@@ -35,11 +36,23 @@ namespace Gastos_API
                 });
             });
 
-            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
 
+            // ? ADICIONE ISSO AQUI ?
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler =
+                        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    // Opcional: ajuda bastante em debug
+                    // options.JsonSerializerOptions.WriteIndented = true;
+                });
+
             services.AddScoped<IDespesaService, DespesaRepository>();
+            services.AddScoped<IEntradaService, EntradaRepository>();
         }
 
         // ========================================

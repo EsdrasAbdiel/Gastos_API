@@ -11,11 +11,13 @@ namespace Gastos_API.Controllers
     [ApiController]
     public class GastosController : ControllerBase
     {
-         private readonly IDespesaService _despesaService;
+        private readonly IDespesaService _despesaService;
+        private readonly IEntradaService _entradaService;
 
-        public GastosController(IDespesaService despesaService)
+        public GastosController(IDespesaService despesaService, IEntradaService entradaService)
         {
             _despesaService = despesaService;
+            _entradaService = entradaService;
         }
 
         [HttpGet("listar/{ano}")]
@@ -26,29 +28,7 @@ namespace Gastos_API.Controllers
         }
 
 
-        //[HttpPost("cadastro")]
-        //public async Task<IActionResult> ReceberDespesas([FromBody] DespesaRequest request)
-        //{
-        //    if (request.Id == Guid.Empty)
-        //        request.Id = Guid.NewGuid();
 
-        //    var despesa = new Despesa
-        //    {
-        //        Id = request.Id,
-        //        ValorTotal = request.ValorTotal,
-        //        Itens = request.Despesas
-        //    };
-
-        //    _context.Despesas.Add(despesa);
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(new
-        //    {
-        //        id = despesa.Id,
-        //        valorTotal = despesa.ValorTotal,
-        //        itens = despesa.Itens
-        //    });
-        //}
 
         [HttpPost("cadastro")]
         public async Task<IActionResult> ReceberDespesas([FromBody] FluxoDeCaixaRequest request)
@@ -61,7 +41,8 @@ namespace Gastos_API.Controllers
                 var despesa = new Despesa
                 {
                     Id = request.Id,
-                    ValorTotal = request.ValorTotal,
+                    ValorDespesaTotal = request.ValorDespesaTotal,
+                    ValorEntradaTotal = request.ValorEntradaTotal,
                     ItensDespesa = request.Despesas,
                     ItensEntrada = request.Entradas,
                     DataInclusao = request.DataInclusao,
@@ -96,121 +77,156 @@ namespace Gastos_API.Controllers
             if (despesa == null)
                 return NotFound("Despesa não encontrada.");
 
-            var itens = await _despesaService.BuscarItensDespesaPorIdAsync(id);
+            var itensDespesas = await _despesaService.BuscarItensDespesaPorIdAsync(id);
+
+            var itensEntradas = await _entradaService.BuscarItensEntradaPorIdAsync(id);
 
             var despesas = new Despesa
             {
                 Id = despesa.Id,
-                ValorTotal = despesa.ValorTotal,
+                ValorDespesaTotal = despesa.ValorDespesaTotal,
+                ValorEntradaTotal = despesa.ValorEntradaTotal,
                 DataInclusao = despesa.DataInclusao,
                 Mes = despesa.Mes,
                 Ano = despesa.Ano,
-                ItensDespesa = itens
+                ItensDespesa = itensDespesas,
+                ItensEntrada = itensEntradas
             };
 
             return Ok(despesas);
         }
 
-        //[HttpPut("atualizarDespesa/{id}")]
-        //public async Task<IActionResult> AtualizarDespesa(Guid id, [FromBody] FluxoDeCaixaRequest request)
-        //{
-        //    if (id != request.Id)
-        //        return BadRequest(new { erro = "ID da URL diferente do corpo.", sucesso = false });
+        [HttpPut("atualizarDespesa/{id}")]
+        public async Task<IActionResult> AtualizarDespesa(Guid id, [FromBody] FluxoDeCaixaRequest request)
+        {
+            if (id != request.Id)
+                return BadRequest(new { erro = "ID da URL diferente do corpo.", sucesso = false });
 
-        //    var despesa = await _context.Despesas
-        //        .Include(d => d.ItensDespesa)
-        //        .FirstOrDefaultAsync(d => d.Id == id);
+            var despesa = await _despesaService.BuscarDespesaComItensPorIdAsync(id);
 
-        //    if (despesa == null)
-        //        return NotFound(new { erro = "Despesa não encontrada.", sucesso = false });
+            if (despesa == null)
+                return NotFound(new { erro = "Despesa não encontrada.", sucesso = false });
 
-        //    try
-        //    {
-        //        // Atualiza campos da despesa
-        //        despesa.ValorTotal = request.ValorTotal;
-        //        despesa.DataInclusao = request.DataInclusao;
-        //        despesa.Mes = request.Mes;
-        //        despesa.Ano = request.Ano;
+            try
+            {
+                // Atualiza campos da despesa
+                despesa.ValorDespesaTotal = request.ValorDespesaTotal;
+                despesa.ValorEntradaTotal = request.ValorEntradaTotal;
+                despesa.DataInclusao = request.DataInclusao;
+                despesa.Mes = request.Mes;
+                despesa.Ano = request.Ano;
 
-        //        // IDs que vieram do frontend (exceto 0)
-        //        var idsDoFrontend = request.Despesas
-        //            .Where(i => i.Id > 0)
-        //            .Select(i => i.Id)
-        //            .ToList();
+                // IDs que vieram do frontend (exceto 0)
+                var idsDespesasDoFrontend = _despesaService.ObterIdsDosItensDespesasExistentes(request.Despesas);
 
-        //        // 1. Remove itens que não vieram mais
-        //        var itensParaRemover = despesa.ItensDespesa
-        //            .Where(db => !idsDoFrontend.Contains(db.Id))
-        //            .ToList();
+                var idsEntradasDoFrontend = _despesaService.ObterIdsDosItensEntradasExistentes(request.Entradas);
 
-        //        if (itensParaRemover.Any())
-        //            _context.DespesaItens.RemoveRange(itensParaRemover);
+                // 1. Remove itens que não vieram mais
+                var itensDespesasParaRemover = _despesaService.ObterItensDespesasParaRemover(despesa.ItensDespesa, idsDespesasDoFrontend);
 
-        //        // 2. Atualiza ou insere os itens recebidos
-        //        foreach (var itemReq in request.Despesas)
-        //        {
-        //            if (itemReq.Id > 0)
-        //            {
-        //                // É atualização
-        //                var itemExistente = despesa.ItensDespesa.FirstOrDefault(x => x.Id == itemReq.Id);
-        //                if (itemExistente != null)
-        //                {
-        //                    itemExistente.Descricao = itemReq.Descricao;
-        //                    itemExistente.Valor = itemReq.Valor;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                // É item novo (Id = 0 ou negativo, tanto faz)
-        //                var novoItem = new DespesaItem
-        //                {
-        //                    DespesaId = despesa.Id,
-        //                    Descricao = itemReq.Descricao,
-        //                    Valor = itemReq.Valor
-        //                    // Id é auto-incremento → não precisa setar
-        //                };
-        //                _context.DespesaItens.Add(novoItem);
-        //            }
-        //        }
+                var itensEntradasParaRemover = _despesaService.ObterItensEntradasParaRemover(despesa.ItensEntrada, idsEntradasDoFrontend);
 
-        //        await _context.SaveChangesAsync();
+                if (itensDespesasParaRemover.Any())
+                    _despesaService.RemoverItensDespesaAsync(itensDespesasParaRemover);
 
-        //        return Ok(new { mensagem = "Despesa atualizada com sucesso.", sucesso = true });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { erro = ex.Message, sucesso = false });
-        //    }
-        //}
+                if (itensEntradasParaRemover.Any())
+                    _despesaService.RemoverItensEntrada(itensEntradasParaRemover);
 
-        //[HttpDelete("deletarDespesa/{id}")]
-        //public async Task<IActionResult> DeletarPeloId(Guid id)
-        //{
-        //    var despesa = await _context.Despesas
-        //        .FirstOrDefaultAsync(d => d.Id == id);
+                // 2. Atualiza ou insere os itens recebidos
+                foreach (var itemReq in request.Despesas)
+                {
+                    if (itemReq.Id > 0)
+                    {
+                        // É atualização
+                        var itemExistente = _despesaService.ObterItemDespesaExistente(despesa.ItensDespesa, itemReq.Id);
 
-        //    if (despesa == null)
-        //        return NotFound(new
-        //        {
-        //            message = "Despesa não encontrada.",
-        //            sucesso = false
-        //        });
+                        if (itemExistente != null)
+                        {
+                            itemExistente.Descricao = itemReq.Descricao;
+                            itemExistente.Valor = itemReq.Valor;
+                        }
+                    }
+                    else
+                    {
+                        // É item novo (Id = 0 ou negativo, tanto faz)
+                        var novoItem = new DespesaItem
+                        {
+                            DespesaId = despesa.Id,
+                            Descricao = itemReq.Descricao,
+                            Valor = itemReq.Valor
+                            // Id é auto-incremento → não precisa setar
+                        };
 
-        //    var itens = await _context.DespesaItens
-        //        .Where(i => i.DespesaId == id)
-        //        .ToListAsync();
+                        await _despesaService.AdicionarNovaDespesaItemAsync(novoItem);
+                    }
+                }
 
-        //    _context.DespesaItens.RemoveRange(itens);
+                foreach (var itemEntradaReq in request.Entradas)
+                {
+                    if (itemEntradaReq.Id > 0)
+                    {
+                        // É atualização
+                        var entradaExistente = _despesaService.ObterItemEntradaExistente(despesa.ItensEntrada, itemEntradaReq.Id);
 
-        //    _context.Despesas.Remove(despesa);
+                        if (entradaExistente != null)
+                        {
+                            entradaExistente.EntradaDescricao = itemEntradaReq.EntradaDescricao;
+                            entradaExistente.EntradaValor = itemEntradaReq.EntradaValor;
+                        }
+                    }
+                    else
+                    {
+                        var novoItem = new EntradaItem
+                        {
+                            Entrada_Id = despesa.Id,
+                            EntradaDescricao = itemEntradaReq.EntradaDescricao,
+                            EntradaValor = itemEntradaReq.EntradaValor
+                        };
 
-        //    await _context.SaveChangesAsync();
+                        await _despesaService.AdicionarNovaEntradaItemAsync(novoItem);
+                    }
+                }
 
-        //    return Ok(new
-        //    {
-        //        message = "Despesa excluida com sucesso",
-        //        sucesso = true
-        //    });
-        //}
+                await _despesaService.SalvarChangesAsync();
+
+
+                return Ok(new { mensagem = "Despesa atualizada com sucesso.", sucesso = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { erro = ex.Message, sucesso = false });
+            }
+        }
+
+        [HttpDelete("deletarDespesa/{id}")]
+        public async Task<IActionResult> DeletarPeloId(Guid id)
+        {
+            var despesa = await _despesaService.BuscarDespesaPorIdAsync(id);
+
+            if (despesa == null)
+                return NotFound(new
+                {
+                    message = "Despesa não encontrada.",
+                    sucesso = false
+                });
+
+            var itensDespesa = await _despesaService.BuscarItensDespesaPorIdAsync(id);
+
+            var itensEntrada = await _entradaService.BuscarItensEntradaPorIdAsync(id);
+
+            _despesaService.RemoverItensDespesaAsync(itensDespesa);
+
+            _despesaService.RemoverItensEntrada(itensEntrada);
+
+            _despesaService.RemoverDespesaAsync(despesa);
+
+            await _despesaService.SalvarChangesAsync();
+
+            return Ok(new
+            {
+                message = "Despesa excluida com sucesso",
+                sucesso = true
+            });
+        }
     }
 }

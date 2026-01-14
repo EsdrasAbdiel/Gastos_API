@@ -6,16 +6,18 @@ namespace Gastos_API.Models
     {
         [Column("id")]
         public Guid Id { get; set; }
-        [Column("valortotal")]
-        public decimal? ValorTotal { get; set; }
+        [Column("valordespesatotal")]
+        public decimal? ValorDespesaTotal { get; set; }
+        [Column("valorentradatotal")]
+        public decimal? ValorEntradaTotal { get; set; }
         [Column("datainclusao")]
         public DateTime DataInclusao { get; set; }
         [Column("mes")]
         public int Mes { get; set; }
         [Column("ano")]
         public int Ano { get; set; }
-        public List<DespesaItem> ItensDespesa { get; set; }
-        public List<EntradaItem> ItensEntrada { get; set; }
+        public List<DespesaItem> ItensDespesa { get; set; } = new();
+        public List<EntradaItem> ItensEntrada { get; set; } = new();
     }
 
 }
