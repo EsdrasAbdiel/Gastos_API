@@ -31,7 +31,7 @@ namespace Gastos_API
                     policy.WithOrigins(
                             "http://localhost:4200",          // Angular local
                             "https://localhost:4200",
-                            "https://esdrasabdiel.github.io/GerenciamentoDeGastos/" // adicione seu domínio real depois
+                            "https://esdrasabdiel.github.io" // adicione seu domínio real depois
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
