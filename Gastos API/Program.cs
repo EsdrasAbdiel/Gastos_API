@@ -18,9 +18,12 @@ namespace Gastos_API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+                webBuilder.UseUrls($"http://+:{port}");
+                webBuilder.UseStartup<Startup>();
+            });
+
     }
 }
