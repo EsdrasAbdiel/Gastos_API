@@ -21,7 +21,7 @@ namespace Gastos_API
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-                webBuilder.UseUrls($"http://+:{port}");
+                webBuilder.UseUrls($"http://0.0.0.0:{port}");
                 webBuilder.UseStartup<Startup>();
             });
 
