@@ -28,9 +28,9 @@ namespace Gastos_API
             // === REGISTRA A POLÍTICA CORS ===
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowReact", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.AllowAnyOrigin()
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
@@ -38,8 +38,6 @@ namespace Gastos_API
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddControllers();
 
             // ? ADICIONE ISSO AQUI ?
             services.AddControllers()
@@ -61,10 +59,8 @@ namespace Gastos_API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // === ATIVA O CORS ===
-            app.UseCors("AllowReact");  // <--- COLOQUE AQUI
-
-            app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors("AllowReact");
             app.UseAuthorization();
 
             // Rota raiz (sua página de status)
