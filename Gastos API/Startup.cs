@@ -18,52 +18,60 @@ namespace Gastos_API
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
 
-        // ========================================
-        // 1. ADICIONE AQUI: ConfigureServices
-        // ========================================
         public void ConfigureServices(IServiceCollection services)
         {
-            // === REGISTRA A POLÍTICA CORS ===
+            // === CORS - Crie uma política nomeada ===
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy("AllowSpecific", policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.WithOrigins(
+                            "http://localhost:4200",          // Angular local
+                            "https://localhost:4200",
+                            "https://esdrasabdiel.github.io/GerenciamentoDeGastos/" // adicione seu domínio real depois
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // se precisar de cookies/auth com credenciais
                 });
+
+                // Para testes rápidos (NÃO use em produção!):
+                // options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
-            // ? ADICIONE ISSO AQUI ?
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.ReferenceHandler =
                         System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-                    // Opcional: ajuda bastante em debug
-                    // options.JsonSerializerOptions.WriteIndented = true;
                 });
 
             services.AddScoped<IDespesaService, DespesaRepository>();
             services.AddScoped<IEntradaService, EntradaRepository>();
         }
 
-        // ========================================
-        // 2. ADICIONE AQUI: Configure (antes do UseRouting)
-        // ========================================
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // === ATIVA O CORS ===
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            // Ordem correta do middleware (importante!)
             app.UseRouting();
-            app.UseCors("AllowReact");
+
+            // Ative o CORS AQUI ? depois de Routing e antes de Authorization/Endpoints
+            app.UseCors("AllowSpecific");  // ? mude para o nome correto da política
+
             app.UseAuthorization();
 
-            // Rota raiz (sua página de status)
+            // Rota raiz (opcional - sua página de status)
             app.MapWhen(context => context.Request.Path == "/", appBranch =>
             {
                 appBranch.Run(async context =>
