@@ -207,3 +207,4 @@ C:\APIs\Gastos API\obj\Debug\net8.0\refint\Gastos API.dll
 C:\APIs\Gastos API\obj\Debug\net8.0\Gastos API.pdb
 C:\APIs\Gastos API\obj\Debug\net8.0\Gastos API.genruntimeconfig.cache
 C:\APIs\Gastos API\obj\Debug\net8.0\ref\Gastos API.dll
+C:\APIs\Gastos API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
