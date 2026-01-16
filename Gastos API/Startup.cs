@@ -41,9 +41,12 @@ namespace Gastos_API
                 // Para testes rápidos (NÃO use em produção!):
                 // options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
+            var connectionString =
+                Environment.GetEnvironmentVariable("DATABASE_URL")
+                ?? Configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(connectionString));
 
             services.AddControllers()
                 .AddJsonOptions(options =>
