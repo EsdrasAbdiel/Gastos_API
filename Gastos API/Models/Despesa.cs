@@ -16,7 +16,9 @@ namespace Gastos_API.Models
         public int Mes { get; set; }
         [Column("ano")]
         public int Ano { get; set; }
+        [NotMapped]
         public List<DespesaItem> ItensDespesa { get; set; } = new();
+        [NotMapped]
         public List<EntradaItem> ItensEntrada { get; set; } = new();
     }
 
