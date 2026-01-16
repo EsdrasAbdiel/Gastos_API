@@ -15,6 +15,8 @@ namespace Gastos_API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            modelBuilder.HasDefaultSchema("public");
         }
     }
 }
