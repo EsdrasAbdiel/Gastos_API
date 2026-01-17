@@ -43,7 +43,12 @@ namespace Gastos_API
             });
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+                    npgsqlOptions =>
+                    {
+                        npgsqlOptions.CommandTimeout(120);
+                    }
+                ));
 
             services.AddControllers()
                 .AddJsonOptions(options =>

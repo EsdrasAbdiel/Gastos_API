@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Gastos_API.Data;
 using Gastos_API.Models;
-using Gastos_API.Data;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Gastos_API.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;  // ← importe isso!
 
 namespace Gastos_API.Controllers
 {
@@ -13,11 +17,13 @@ namespace Gastos_API.Controllers
     {
         private readonly IDespesaService _despesaService;
         private readonly IEntradaService _entradaService;
+        private readonly IConfiguration Configuration;
 
-        public GastosController(IDespesaService despesaService, IEntradaService entradaService)
+        public GastosController(IDespesaService despesaService, IEntradaService entradaService, IConfiguration configuration)
         {
             _despesaService = despesaService;
             _entradaService = entradaService;
+            Configuration = configuration;
         }
 
         [HttpGet("listar/{ano}")]
@@ -27,7 +33,32 @@ namespace Gastos_API.Controllers
             return Ok(despesas);
         }
 
+        [HttpGet("test-db-connection")]
+        public async Task<IActionResult> TestDbConnection()
+        {
+            try
+            {
+                var sw = Stopwatch.StartNew();
 
+                await using var conn = new NpgsqlConnection(
+                    Configuration.GetConnectionString("DefaultConnection")  // ← use _configuration
+                );
+
+                await conn.OpenAsync();
+
+                return Ok($"Conexão com PostgreSQL OK! Tempo: {sw.ElapsedMilliseconds} ms");
+            }
+            catch (Exception ex)
+            {
+                // Retorne detalhes para debug (remova ou logue em produção!)
+                return StatusCode(500,
+                    $"Falha na conexão: {ex.Message}\n" +
+                    $"Inner: {ex.InnerException?.Message}\n" +
+                    $"Stack: {ex.StackTrace}");
+            }
+        }
+
+        // ... seus outros endpoints aqui (GetDespesas etc.)
 
 
         [HttpPost("cadastro")]
