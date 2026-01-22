@@ -42,13 +42,16 @@ namespace Gastos_API
                 // options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+            services.AddDbContext<AppDbContext>(
+                options => options.UseNpgsql(
+                    Configuration.GetConnectionString("DefaultConnection"),
                     npgsqlOptions =>
                     {
-                        npgsqlOptions.CommandTimeout(120);
-                    }
-                ));
+                        npgsqlOptions.CommandTimeout(30);
+                    }),
+                ServiceLifetime.Scoped
+            );
+
 
             services.AddControllers()
                 .AddJsonOptions(options =>
