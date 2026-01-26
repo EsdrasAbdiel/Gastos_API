@@ -33,33 +33,6 @@ namespace Gastos_API.Controllers
             return Ok(despesas);
         }
 
-        [HttpGet("test-db-connection")]
-        public async Task<IActionResult> TestDbConnection()
-        {
-            try
-            {
-                var sw = Stopwatch.StartNew();
-
-                await using var conn = new NpgsqlConnection(
-                    Configuration.GetConnectionString("DefaultConnection")  // ← use _configuration
-                );
-
-                await conn.OpenAsync();
-
-                return Ok($"Conexão com PostgreSQL OK! Tempo: {sw.ElapsedMilliseconds} ms");
-            }
-            catch (Exception ex)
-            {
-                // Retorne detalhes para debug (remova ou logue em produção!)
-                return StatusCode(500,
-                    $"Falha na conexão: {ex.Message}\n" +
-                    $"Inner: {ex.InnerException?.Message}\n" +
-                    $"Stack: {ex.StackTrace}");
-            }
-        }
-
-        // ... seus outros endpoints aqui (GetDespesas etc.)
-
 
         [HttpPost("cadastro")]
         public async Task<IActionResult> ReceberDespesas([FromBody] FluxoDeCaixaRequest request)

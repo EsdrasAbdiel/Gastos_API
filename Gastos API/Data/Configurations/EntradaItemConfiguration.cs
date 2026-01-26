@@ -33,7 +33,7 @@ namespace Gastos_API.Data.Configurations
             builder.HasOne(i => i.Despesa)
                    .WithMany(d => d.ItensEntrada)
                    .HasForeignKey(i => i.Entrada_Id)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
