@@ -16,6 +16,8 @@ namespace Gastos_API.Data.Configurations
                    .HasMaxLength(200);
             builder.Property(x => x.Valor)
                    .HasColumnType("decimal(10,2)");
+            builder.Property(x => x.Pago)
+                   .HasColumnType("boolean");
         }
     }
 }

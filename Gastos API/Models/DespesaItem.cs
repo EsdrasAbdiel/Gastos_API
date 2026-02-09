@@ -12,5 +12,7 @@ namespace Gastos_API.Models
         public decimal Valor { get; set; }
         [Column("despesaid")]
         public Guid DespesaId { get; set; }
+        [Column("pago")]
+        public bool Pago { get; set; }
     }
 }

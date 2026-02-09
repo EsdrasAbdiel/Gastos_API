@@ -148,6 +148,7 @@ namespace Gastos_API.Controllers
                         {
                             itemExistente.Descricao = itemReq.Descricao;
                             itemExistente.Valor = itemReq.Valor;
+                            itemExistente.Pago = itemReq.Pago;
                         }
                     }
                     else
@@ -157,7 +158,8 @@ namespace Gastos_API.Controllers
                         {
                             DespesaId = despesa.Id,
                             Descricao = itemReq.Descricao,
-                            Valor = itemReq.Valor
+                            Valor = itemReq.Valor,
+                            Pago = itemReq.Pago
                             // Id é auto-incremento → não precisa setar
                         };
 
