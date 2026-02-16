@@ -1,6 +1,7 @@
 ﻿using Gastos_API.Data;
 using Gastos_API.Models;
 using Gastos_API.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gastos_API.Repositorios
 {
@@ -17,6 +18,11 @@ namespace Gastos_API.Repositorios
             _context.Registro.Add(registro);
             await _context.SaveChangesAsync();
             return registro;
+        }
+
+        public async Task<Registro?> BuscarUsuarioPeloEmailAsync(string email)
+        {
+            return await _context.Registro.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }
