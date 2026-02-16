@@ -62,6 +62,7 @@ namespace Gastos_API
 
             services.AddScoped<IDespesaService, DespesaRepository>();
             services.AddScoped<IEntradaService, EntradaRepository>();
+            services.AddScoped<IAuthService, AuthRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
