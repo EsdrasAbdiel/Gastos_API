@@ -2,13 +2,11 @@ using Gastos_API.Data;
 using Gastos_API.Interfaces;
 using Gastos_API.Repositorios;
 using Gastos_API.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace Gastos_API
 {
@@ -23,23 +21,20 @@ namespace Gastos_API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // === CORS - Crie uma política nomeada ===
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecific", policy =>
                 {
                     policy.WithOrigins(
-                            "http://localhost:4200",          // Angular local
+                            "http://localhost:4200",
                             "https://localhost:4200",
-                            "https://esdrasabdiel.github.io" // adicione seu domínio real depois
+                            "https://esdrasabdiel.github.io"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials(); // se precisar de cookies/auth com credenciais
+                        .AllowCredentials();
                 });
 
-                // Para testes rápidos (NÃO use em produção!):
-                // options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
             services.AddDbContext<AppDbContext>(
@@ -52,6 +47,44 @@ namespace Gastos_API
                 ServiceLifetime.Scoped
             );
 
+            var jwtKey = Configuration["Jwt:Key"];
+            var key = Encoding.ASCII.GetBytes(jwtKey);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["jwt"];
+                        return Task.CompletedTask;
+                    }
+                };
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Audience"],
+
+                    ValidateLifetime = true
+                };
+
+
+            });
+
+            services.AddAuthorization();
 
             services.AddControllers()
                 .AddJsonOptions(options =>
@@ -72,15 +105,13 @@ namespace Gastos_API
                 app.UseDeveloperExceptionPage();
             }
 
-            // Ordem correta do middleware (importante!)
             app.UseRouting();
 
-            // Ative o CORS AQUI ? depois de Routing e antes de Authorization/Endpoints
-            app.UseCors("AllowSpecific");  // ? mude para o nome correto da política
+            app.UseCors("AllowSpecific");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            // Rota raiz (opcional - sua página de status)
             app.MapWhen(context => context.Request.Path == "/", appBranch =>
             {
                 appBranch.Run(async context =>

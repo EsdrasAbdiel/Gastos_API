@@ -1,10 +1,12 @@
 ﻿using Gastos_API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Gastos_API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerBase
