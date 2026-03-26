@@ -2,47 +2,48 @@
 using Gastos_API.Models;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;  // ← importe isso!
 
 namespace Gastos_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GastosController : ControllerBase
+    public class ResumoFinanceiroMensalController : ControllerBase
     {
         private readonly IDespesaService _despesaService;
         private readonly IEntradaService _entradaService;
+        private readonly IResumoFinanceiroMensalService _resumoFinanceiroMensalService;
         private readonly IConfiguration Configuration;
 
-        public GastosController(IDespesaService despesaService, IEntradaService entradaService, IConfiguration configuration)
+        public ResumoFinanceiroMensalController(
+            IDespesaService despesaService, 
+            IEntradaService entradaService, 
+            IResumoFinanceiroMensalService resumoFinanceiroMensalService,
+            IConfiguration configuration
+            )
         {
             _despesaService = despesaService;
             _entradaService = entradaService;
+            _resumoFinanceiroMensalService = resumoFinanceiroMensalService;
             Configuration = configuration;
         }
 
         [HttpGet("listar/{ano}")]
-        public async Task<ActionResult<IEnumerable<Despesa>>> GetDespesas(int ano)
+        public async Task<ActionResult<IEnumerable<ResumoFinanceiroMensal>>> GetDespesas(int ano)
         {
-            var despesas = await _despesaService.BuscarTodasAsDespesasAsync(ano);
+            var despesas = await _resumoFinanceiroMensalService.BuscarTodasAsDespesasAsync(ano);
             return Ok(despesas);
         }
 
 
         [HttpPost("cadastro")]
-        public async Task<IActionResult> ReceberDespesas([FromBody] FluxoDeCaixaRequest request)
+        public async Task<IActionResult> ReceberDespesas([FromBody] ResumoFinanceiroMensalRequest request)
         {
             try
             {
                 if (request.Id == Guid.Empty)
                     request.Id = Guid.NewGuid();
 
-                var despesa = new Despesa
+                var despesa = new ResumoFinanceiroMensal
                 {
                     Id = request.Id,
                     ValorDespesaTotal = request.ValorDespesaTotal,
@@ -54,7 +55,7 @@ namespace Gastos_API.Controllers
                     Ano = request.Ano
                 };
 
-                await _despesaService.AdicionarDespesaAsync(despesa);
+                await _resumoFinanceiroMensalService.AdicionarDespesaAsync(despesa);
 
                 return Ok(new
                 {
@@ -76,7 +77,7 @@ namespace Gastos_API.Controllers
         public async Task<ActionResult> BuscarPeloId(Guid id)
         {
 
-            var despesa = await _despesaService.BuscarDespesaPorIdAsync(id);
+            var despesa = await _resumoFinanceiroMensalService.BuscarDespesaPorIdAsync(id);
 
             if (despesa == null)
                 return NotFound("Despesa não encontrada.");
@@ -85,7 +86,7 @@ namespace Gastos_API.Controllers
 
             var itensEntradas = await _entradaService.BuscarItensEntradaPorIdAsync(id);
 
-            var despesas = new Despesa
+            var despesas = new ResumoFinanceiroMensal
             {
                 Id = despesa.Id,
                 ValorDespesaTotal = despesa.ValorDespesaTotal,
@@ -101,12 +102,12 @@ namespace Gastos_API.Controllers
         }
 
         [HttpPut("atualizarDespesa/{id}")]
-        public async Task<IActionResult> AtualizarDespesa(Guid id, [FromBody] FluxoDeCaixaRequest request)
+        public async Task<IActionResult> AtualizarDespesa(Guid id, [FromBody] ResumoFinanceiroMensalRequest request)
         {
             if (id != request.Id)
                 return BadRequest(new { erro = "ID da URL diferente do corpo.", sucesso = false });
 
-            var despesa = await _despesaService.BuscarDespesaComItensPorIdAsync(id);
+            var despesa = await _resumoFinanceiroMensalService.BuscarDespesaComItensPorIdAsync(id);
 
             if (despesa == null)
                 return NotFound(new { erro = "Despesa não encontrada.", sucesso = false });
@@ -123,18 +124,18 @@ namespace Gastos_API.Controllers
                 // IDs que vieram do frontend (exceto 0)
                 var idsDespesasDoFrontend = _despesaService.ObterIdsDosItensDespesasExistentes(request.Despesas);
 
-                var idsEntradasDoFrontend = _despesaService.ObterIdsDosItensEntradasExistentes(request.Entradas);
+                var idsEntradasDoFrontend = _entradaService.ObterIdsDosItensEntradasExistentes(request.Entradas);
 
                 // 1. Remove itens que não vieram mais
                 var itensDespesasParaRemover = _despesaService.ObterItensDespesasParaRemover(despesa.ItensDespesa, idsDespesasDoFrontend);
 
-                var itensEntradasParaRemover = _despesaService.ObterItensEntradasParaRemover(despesa.ItensEntrada, idsEntradasDoFrontend);
+                var itensEntradasParaRemover = _entradaService.ObterItensEntradasParaRemover(despesa.ItensEntrada, idsEntradasDoFrontend);
 
                 if (itensDespesasParaRemover.Any())
                     _despesaService.RemoverItensDespesaAsync(itensDespesasParaRemover);
 
                 if (itensEntradasParaRemover.Any())
-                    _despesaService.RemoverItensEntrada(itensEntradasParaRemover);
+                    _entradaService.RemoverItensEntrada(itensEntradasParaRemover);
 
                 // 2. Atualiza ou insere os itens recebidos
                 foreach (var itemReq in request.Despesas)
@@ -172,7 +173,7 @@ namespace Gastos_API.Controllers
                     if (itemEntradaReq.Id > 0)
                     {
                         // É atualização
-                        var entradaExistente = _despesaService.ObterItemEntradaExistente(despesa.ItensEntrada, itemEntradaReq.Id);
+                        var entradaExistente = _entradaService.ObterItemEntradaExistente(despesa.ItensEntrada, itemEntradaReq.Id);
 
                         if (entradaExistente != null)
                         {
@@ -189,11 +190,11 @@ namespace Gastos_API.Controllers
                             EntradaValor = itemEntradaReq.EntradaValor
                         };
 
-                        await _despesaService.AdicionarNovaEntradaItemAsync(novoItem);
+                        await _entradaService.AdicionarNovaEntradaItemAsync(novoItem);
                     }
                 }
 
-                await _despesaService.SalvarChangesAsync();
+                await _resumoFinanceiroMensalService.SalvarChangesAsync();
 
 
                 return Ok(new { mensagem = "Despesa atualizada com sucesso.", sucesso = true });
@@ -207,7 +208,7 @@ namespace Gastos_API.Controllers
         [HttpDelete("deletarDespesa/{id}")]
         public async Task<IActionResult> DeletarPeloId(Guid id)
         {
-            var despesa = await _despesaService.BuscarDespesaPorIdAsync(id);
+            var despesa = await _resumoFinanceiroMensalService.BuscarDespesaPorIdAsync(id);
 
             if (despesa == null)
                 return NotFound(new
@@ -222,11 +223,11 @@ namespace Gastos_API.Controllers
 
             _despesaService.RemoverItensDespesaAsync(itensDespesa);
 
-            _despesaService.RemoverItensEntrada(itensEntrada);
+            _entradaService.RemoverItensEntrada(itensEntrada);
 
-            _despesaService.RemoverDespesaAsync(despesa);
+            _resumoFinanceiroMensalService.RemoverDespesaAsync(despesa);
 
-            await _despesaService.SalvarChangesAsync();
+            await _resumoFinanceiroMensalService.SalvarChangesAsync();
 
             return Ok(new
             {

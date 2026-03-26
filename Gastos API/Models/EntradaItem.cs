@@ -6,7 +6,6 @@
         public string EntradaDescricao { get; set; }
         public decimal EntradaValor { get; set; }
         public Guid Entrada_Id { get; set; }
-
-        public Despesa? Despesa { get; set; }
+        public ResumoFinanceiroMensal? Despesa { get; set; }
     }
 }

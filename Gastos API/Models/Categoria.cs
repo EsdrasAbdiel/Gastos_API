@@ -2,11 +2,12 @@
 
 namespace Gastos_API.Models
 {
-    public class Despesa
+    public class Categoria
     {
+        [Column("id")]
         public int Id { get; set; }
+        [Column("descricao")]
         public string Descricao { get; set; }
-        public int CategoriaId{ get; set; }
-        public Categoria Categoria { get; set; }
+        public ICollection<Despesa> Despesas { get; set; }
     }
 }
