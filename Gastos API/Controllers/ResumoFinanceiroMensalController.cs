@@ -52,7 +52,8 @@ namespace Gastos_API.Controllers
                     ItensEntrada = request.Entradas,
                     DataInclusao = request.DataInclusao,
                     Mes = request.Mes,
-                    Ano = request.Ano
+                    Ano = request.Ano,
+                    UsuarioId = request.UsuarioId
                 };
 
                 await _resumoFinanceiroMensalService.AdicionarDespesaAsync(despesa);
@@ -89,6 +90,7 @@ namespace Gastos_API.Controllers
             var despesas = new ResumoFinanceiroMensal
             {
                 Id = despesa.Id,
+                UsuarioId = despesa.UsuarioId,
                 ValorDespesaTotal = despesa.ValorDespesaTotal,
                 ValorEntradaTotal = despesa.ValorEntradaTotal,
                 DataInclusao = despesa.DataInclusao,

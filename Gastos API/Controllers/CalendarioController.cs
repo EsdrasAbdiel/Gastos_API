@@ -54,7 +54,26 @@ namespace Gastos_API.Controllers
                 .ToList();
 
             return Ok(meses);
-        } 
+        }
+
+        [HttpGet("dashboard/meses")]
+        public ActionResult<IEnumerable<Mes>> GetMesesDashboard()
+        {
+            var language = new CultureInfo("pt-BR");
+
+            var meses = Enumerable.Range(1, 12)
+                .Select(m => new Mes
+                {
+                    Id = m,
+                    Nome = language.TextInfo.ToTitleCase(
+                        language.DateTimeFormat.GetMonthName(m).ToLower()),
+                    NomeAbreviado = language.TextInfo.ToTitleCase(
+                        language.DateTimeFormat.GetAbbreviatedMonthName(m).ToLower())
+                })
+                .ToList();
+
+            return Ok(meses);
+        }
     }
 }
  

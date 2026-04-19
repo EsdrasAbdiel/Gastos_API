@@ -10,5 +10,6 @@
         public int Mes { get; set; }
         public required List<DespesaItem> Despesas { get; set; }
         public required List<EntradaItem> Entradas { get; set; }
+        public Guid UsuarioId { get; set; }
     }
 }

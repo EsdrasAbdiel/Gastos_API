@@ -4,6 +4,8 @@ namespace Gastos_API.Models
 {
     public class ResumoFinanceiroMensal
     {
+        [Column("usuarioId")]
+        public Guid UsuarioId { get; set; }
         [Column("id")]
         public Guid Id { get; set; }
         [Column("valordespesatotal")]
@@ -20,6 +22,9 @@ namespace Gastos_API.Models
         public List<DespesaItem> ItensDespesa { get; set; } = new();
         [NotMapped]
         public List<EntradaItem> ItensEntrada { get; set; } = new();
+        [NotMapped]
+        public Registro Usuario { get; set; } = null!;
+
     }
 
 }

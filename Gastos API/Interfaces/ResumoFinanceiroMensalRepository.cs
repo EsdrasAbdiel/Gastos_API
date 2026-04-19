@@ -30,6 +30,7 @@ namespace Gastos_API.Interfaces
         public async Task<ResumoFinanceiroMensal?> BuscarDespesaPorIdAsync(Guid id)
         {
             return await _context.ResumoFinanceiroMensal
+                                 .Include(x => x.Usuario)
                                  .FirstOrDefaultAsync(d => d.Id == id);
         }
 

@@ -15,9 +15,9 @@ namespace Gastos_API.Data.Configurations
             builder.Property(x => x.Descricao).HasColumnName("descricao");
             builder.Property(x => x.CategoriaId).HasColumnName("categoria_id");
             builder.HasOne(x => x.Categoria)
-       .WithMany(x => x.Despesas)
-       .HasForeignKey(x => x.CategoriaId)
-       .OnDelete(DeleteBehavior.Restrict);
+               .WithMany(x => x.Despesas)
+               .HasForeignKey(x => x.CategoriaId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         }
     }
