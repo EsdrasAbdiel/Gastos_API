@@ -35,7 +35,18 @@ namespace Gastos_API.Controllers
                 .ToListAsync();
 
             if (!resumo.Any())
-                return NotFound("Nenhum registro encontrado para este usuário.");
+            {
+                var dashboardVazio = new DashboardDTO
+                {
+                    TotalDespesas = 0,
+                    TotalEntradas = 0,
+                    TotalSaldo = 0,
+                    QuantidadeRegistro = 0,
+                    Registros = new List<ResumoFinanceiroMensal>()
+                };
+
+                return Ok(dashboardVazio);
+            }
 
             var resumoIds = resumo.Select(r => r.Id).ToList();
 
