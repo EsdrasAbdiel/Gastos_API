@@ -6,5 +6,6 @@ namespace Gastos_API.Services
     {
         Task<Registro> AdicionarRegistroAsync(Registro registro);
         Task<Registro?> BuscarUsuarioPeloEmailAsync(string email);
+        string GerarToken(Registro registro);
     }
 }

@@ -2,15 +2,11 @@
 using Gastos_API.Models;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;  // ← importe isso!
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gastos_API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GastosController : ControllerBase
