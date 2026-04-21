@@ -1,10 +1,11 @@
 ﻿using Gastos_API.Models;
 using Gastos_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Gastos_API.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -79,11 +80,37 @@ namespace Gastos_API.Controllers
                     sucesso = false
                 });
 
+            var token = _authService.GerarToken(registro);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(2)
+            };
+
+            Response.Cookies.Append("jwt", token, cookieOptions);
+            
             return Ok(new
             {
+                resultado = response.Id,
                 mensagem = "Login efetuado com sucesso",
                 sucesso = true
             });
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            return Ok();
+        }
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            return Ok();
         }
     }
 }

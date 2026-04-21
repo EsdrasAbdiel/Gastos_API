@@ -1,14 +1,10 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Gastos_API.Models
+﻿namespace Gastos_API.DTOs
 {
-    public class EntradaItem
+    public class EntradaDTO
     {
         public int Id { get; set; }
         public string EntradaDescricao { get; set; }
         public decimal EntradaValor { get; set; }
         public Guid Entrada_Id { get; set; }
-        [JsonIgnore]
-        public ResumoFinanceiroMensal? Despesa { get; set; }
     }
 }

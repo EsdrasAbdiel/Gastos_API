@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Gastos_API.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Gastos_API.Models;
+
 
 namespace Gastos_API.Data.Configurations
 {
@@ -8,14 +9,16 @@ namespace Gastos_API.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Despesa> builder)
         {
-            builder.ToTable("despesas");
+            builder.ToTable("despesa");
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id)
-                   .HasColumnType("uuid");
-            builder.HasMany(x => x.ItensDespesa)
-                   .WithOne()
-                   .HasForeignKey(x => x.DespesaId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(x => x.Id).HasColumnName("id");
+            builder.Property(x => x.Descricao).HasColumnName("descricao");
+            builder.Property(x => x.CategoriaId).HasColumnName("categoria_id");
+            builder.HasOne(x => x.Categoria)
+               .WithMany(x => x.Despesas)
+               .HasForeignKey(x => x.CategoriaId)
+               .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

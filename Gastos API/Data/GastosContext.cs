@@ -5,12 +5,12 @@ namespace Gastos_API.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Despesa> Despesas { get; set; }
+        public DbSet<ResumoFinanceiroMensal> ResumoFinanceiroMensal { get; set; }
         public DbSet<EntradaItem> EntradaItens { get; set; }
         public DbSet<DespesaItem> DespesaItens { get; set; }
         public DbSet<Registro> Registro { get; set; }
-
-
+        public DbSet<Despesa> Despesa { get; set; }
+        public DbSet<Categoria> Categoria { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

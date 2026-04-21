@@ -16,5 +16,7 @@ namespace Gastos_API.Models
         public int Senha { get; set; }
         [Column("confirmarsenha")]
         public int ConfirmarSenha { get; set; }
+        public List<ResumoFinanceiroMensal> ResumosFinanceiros { get; set; } = new();
+
     }
 }
