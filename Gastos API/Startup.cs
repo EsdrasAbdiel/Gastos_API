@@ -43,7 +43,7 @@ namespace Gastos_API
                     npgsqlOptions =>
                     {
                         npgsqlOptions.CommandTimeout(30);
-                    }),
+                    }).LogTo(Console.WriteLine),
                 ServiceLifetime.Scoped
             );
 
@@ -95,6 +95,7 @@ namespace Gastos_API
 
             services.AddScoped<IDespesaService, DespesaRepository>();
             services.AddScoped<IEntradaService, EntradaRepository>();
+            services.AddScoped<IResumoFinanceiroMensalService, ResumoFinanceiroMensalRepository>();
             services.AddScoped<IAuthService, AuthRepository>();
         }
 

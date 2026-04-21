@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Gastos_API.Models
+namespace Gastos_API.DTOs
 {
-    public class Despesa
+    public class CategoriaDTO
     {
         public int Id { get; set; }
         public string Descricao { get; set; }
-        public int CategoriaId{ get; set; }
-        public Categoria Categoria { get; set; }
     }
 }

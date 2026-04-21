@@ -94,6 +94,7 @@ namespace Gastos_API.Controllers
             
             return Ok(new
             {
+                resultado = response.Id,
                 mensagem = "Login efetuado com sucesso",
                 sucesso = true
             });
