@@ -2,8 +2,8 @@ using Gastos_API.Data;
 using Gastos_API.Interfaces;
 using Gastos_API.Repositorios;
 using Gastos_API.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 

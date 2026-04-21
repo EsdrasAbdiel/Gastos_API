@@ -1,6 +1,7 @@
 ﻿using Gastos_API.Data;
 using Gastos_API.Models;
 using Gastos_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gastos_API.Controllers
