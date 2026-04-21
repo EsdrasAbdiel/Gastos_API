@@ -4,6 +4,7 @@ using Gastos_API.Models;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Gastos_API.Controllers
 {
@@ -36,34 +37,39 @@ namespace Gastos_API.Controllers
             if (!resumo.Any())
                 return NotFound("Nenhum registro encontrado para este usuário.");
 
-            var registros = new List<ResumoFinanceiroMensal>();
+            var resumoIds = resumo.Select(r => r.Id).ToList();
 
-            foreach (var item in resumo)
+            var todasDespesas = await _context.DespesaItens.Where(d => resumoIds.Contains(d.DespesaId)).ToListAsync();
+            var todasEntradas = await _context.EntradaItens.Where(d => resumoIds.Contains(d.Entrada_Id)).ToListAsync();
+
+            var despesasPorResumo = todasDespesas.GroupBy(d => d.DespesaId).ToDictionary(g => g.Key, g => g.ToList());
+            var entradasPorResumo = todasEntradas.GroupBy(d => d.Entrada_Id).ToDictionary(g => g.Key, g => g.ToList());
+
+            var registros = resumo.Select(item => new ResumoFinanceiroMensal
             {
-                var despesas = await _despesaService.BuscarItensDespesaPorIdAsync(item.Id);
-                var entradas = await _entradaService.BuscarItensEntradaPorIdAsync(item.Id);
+                UsuarioId = item.UsuarioId,
+                Id = item.Id,
+                ValorDespesaTotal = item.ValorDespesaTotal,
+                ValorEntradaTotal = item.ValorEntradaTotal,
+                DataInclusao = item.DataInclusao,
+                Mes = item.Mes,
+                Ano = item.Ano,
 
-                var itemRegistro = new ResumoFinanceiroMensal
-                {
-                    UsuarioId = item.UsuarioId,
-                    Id = item.Id,
-                    ValorDespesaTotal = item.ValorDespesaTotal,
-                    ValorEntradaTotal = item.ValorEntradaTotal,
-                    DataInclusao = item.DataInclusao,
-                    Mes = item.Mes,
-                    Ano = item.Ano,
-                    ItensDespesa = despesas,
-                    ItensEntrada = entradas
-                };
+                ItensDespesa = despesasPorResumo.ContainsKey(item.Id)
+                    ? despesasPorResumo[item.Id]
+                    : new List<DespesaItem>(),
 
-                registros.Add(itemRegistro);
-            }
+                ItensEntrada = entradasPorResumo.ContainsKey(item.Id)
+                    ? entradasPorResumo[item.Id]
+                    : new List<EntradaItem>()
+                    }).ToList();
 
             var dashboard = new DashboardDTO
             {
                 TotalDespesas = resumo.Sum(x => x.ValorDespesaTotal ?? 0),
                 TotalEntradas = resumo.Sum(x => x.ValorEntradaTotal ?? 0),
-                TotalSaldo = resumo.Sum(x => x.ValorEntradaTotal ?? 0) - resumo.Sum(x => x.ValorDespesaTotal ?? 0),
+                TotalSaldo = resumo.Sum(x => x.ValorEntradaTotal ?? 0)
+                     - resumo.Sum(x => x.ValorDespesaTotal ?? 0),
                 QuantidadeRegistro = resumo.Count,
                 Registros = registros
             };
