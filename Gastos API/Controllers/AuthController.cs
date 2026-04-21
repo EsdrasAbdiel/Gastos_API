@@ -55,6 +55,7 @@ namespace Gastos_API.Controllers
         public async Task<ActionResult> BuscarUsuarioPeloEmail([FromBody] Registro registro)
         {
             var response = await _authService.BuscarUsuarioPeloEmailAsync(registro.Email);
+            Console.WriteLine(response);
 
             if (response == null)
             {
@@ -81,6 +82,7 @@ namespace Gastos_API.Controllers
 
             return Ok(new
             {
+                resultado = response.Id,
                 mensagem = "Login efetuado com sucesso",
                 sucesso = true
             });

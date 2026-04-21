@@ -7,7 +7,7 @@ namespace Gastos_API.Models
         [Column("id")]
         public int Id { get; set; }
         [Column("descricao")]
-        public string Descricao { get; set; }
+        public string Descricao { get; set; } = String.Empty;
         [Column("valor")]
         public decimal Valor { get; set; }
         [Column("despesaid")]
