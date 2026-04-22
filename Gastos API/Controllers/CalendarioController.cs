@@ -35,11 +35,11 @@ namespace Gastos_API.Controllers
         }
 
         [HttpGet("listar/meses")]
-        public async Task<ActionResult<IEnumerable<MesRelacionadoDespesas>>> GetMeses(int ano)
+        public async Task<ActionResult<IEnumerable<MesRelacionadoDespesas>>> GetMeses(int ano, Guid usuarioId)
         {
             var language = new CultureInfo("pt-BR");
 
-            var despesas = await _context.ResumoFinanceiroMensal.Where(d => d.Ano == ano).ToListAsync();
+            var despesas = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
 
             var meses = Enumerable.Range(1, 12)
                 .Select(m => new MesRelacionadoDespesas
