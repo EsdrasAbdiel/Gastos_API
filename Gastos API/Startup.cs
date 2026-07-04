@@ -1,3 +1,4 @@
+using Gastos_API.BackgroundServices;
 using Gastos_API.Data;
 using Gastos_API.Interfaces;
 using Gastos_API.Repositorios;
@@ -97,6 +98,9 @@ namespace Gastos_API
             services.AddScoped<IEntradaService, EntradaRepository>();
             services.AddScoped<IResumoFinanceiroMensalService, ResumoFinanceiroMensalRepository>();
             services.AddScoped<IAuthService, AuthRepository>();
+            services.AddScoped<ICalendarioService, CalendarioRepository>();
+
+            //services.AddHostedService<CompetenciaBackgroundService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

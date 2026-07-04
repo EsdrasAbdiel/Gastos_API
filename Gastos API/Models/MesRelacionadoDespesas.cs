@@ -1,4 +1,6 @@
-﻿namespace Gastos_API.Models
+﻿using Gastos_API.Enums;
+
+namespace Gastos_API.Models
 {
     public class MesRelacionadoDespesas
     {
@@ -6,5 +8,7 @@
         public string Nome { get; set; }
         public string NomeAbreviado { get; set; }
         public Guid? DespesaId { get; set; }
+        public StatusCompetencia StatusCompetenciaMes { get; set; }
+        public int ValorSaidaTotal { get; set; }
     }
 }

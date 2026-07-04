@@ -35,6 +35,8 @@ namespace Gastos_API.Data.Configurations
             builder.Property(x => x.Ano)
                    .HasColumnName("ano");
 
+            builder.Ignore(x => x.StatusCompetenciaMes);
+
             builder.HasMany(x => x.ItensDespesa)
                    .WithOne()
                    .HasForeignKey(x => x.DespesaId)

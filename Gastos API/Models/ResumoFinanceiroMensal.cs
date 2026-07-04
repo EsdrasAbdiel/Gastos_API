@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Gastos_API.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gastos_API.Models
 {
     public class ResumoFinanceiroMensal
     {
+        public StatusCompetencia StatusCompetenciaMes { get; set; }
         [Column("usuarioId")]
         public Guid UsuarioId { get; set; }
         [Column("id")]
