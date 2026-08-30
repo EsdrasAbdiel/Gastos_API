@@ -11,6 +11,7 @@ namespace Gastos_API.Data
         public DbSet<Registro> Registro { get; set; }
         public DbSet<Despesa> Despesa { get; set; }
         public DbSet<Categoria> Categoria { get; set; }
+        public DbSet<ImportacaoExtrato> ImportacaoExtrato {  get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

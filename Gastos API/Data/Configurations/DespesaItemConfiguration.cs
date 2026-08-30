@@ -18,6 +18,9 @@ namespace Gastos_API.Data.Configurations
                    .HasColumnType("decimal(10,2)");
             builder.Property(x => x.Pago)
                    .HasColumnType("boolean");
+            builder.Property(x => x.DataInclusao)
+                    .HasColumnType("date")
+                    .HasColumnName("datainclusao");
         }
     }
 }

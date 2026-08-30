@@ -13,5 +13,6 @@ namespace Gastos_API.Services
         void RemoverDespesaAsync(ResumoFinanceiroMensal despesa);
         Task SalvarChangesAsync();
         Task DeletarDespesaAsync(Guid id);
+        Task<ResumoFinanceiroMensal?> BuscarPorAnoEMes(int ano, int mes, Guid usuarioId);
     }
 }

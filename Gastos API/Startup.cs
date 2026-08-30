@@ -17,9 +17,7 @@ namespace Gastos_API
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
@@ -81,8 +79,6 @@ namespace Gastos_API
 
                     ValidateLifetime = true
                 };
-
-
             });
 
             services.AddAuthorization();
@@ -92,6 +88,9 @@ namespace Gastos_API
                 {
                     options.JsonSerializerOptions.ReferenceHandler =
                         System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.PropertyNamingPolicy =
+                        System.Text.Json.JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 });
 
             services.AddScoped<IDespesaService, DespesaRepository>();
@@ -100,7 +99,7 @@ namespace Gastos_API
             services.AddScoped<IAuthService, AuthRepository>();
             services.AddScoped<ICalendarioService, CalendarioRepository>();
 
-            //services.AddHostedService<CompetenciaBackgroundService>();
+            services.AddHostedService<CompetenciaBackgroundService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

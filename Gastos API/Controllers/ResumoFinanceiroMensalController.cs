@@ -40,7 +40,6 @@ namespace Gastos_API.Controllers
             return Ok(despesas);
         }
 
-
         [HttpPost("cadastro")]
         public async Task<IActionResult> ReceberDespesas([FromBody] ResumoFinanceiroMensalRequest request)
         {

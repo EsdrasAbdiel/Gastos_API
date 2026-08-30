@@ -9,6 +9,7 @@ namespace Gastos_API.Models
         public string NomeAbreviado { get; set; }
         public Guid? DespesaId { get; set; }
         public StatusCompetencia StatusCompetenciaMes { get; set; }
-        public int ValorSaidaTotal { get; set; }
+        public decimal? ValorDespesaTotal { get; set; }
+        public decimal? ValorReceitaTotal { get; set; }
     }
 }

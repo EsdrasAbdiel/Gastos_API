@@ -15,7 +15,7 @@ namespace Gastos_API.Models
         [Column("valorentradatotal")]
         public decimal? ValorEntradaTotal { get; set; }
         [Column("datainclusao")]
-        public DateTime DataInclusao { get; set; }
+        public DateOnly DataInclusao { get; set; }
         [Column("mes")]
         public int Mes { get; set; }
         [Column("ano")]

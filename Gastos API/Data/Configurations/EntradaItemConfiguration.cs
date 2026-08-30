@@ -30,7 +30,7 @@ namespace Gastos_API.Data.Configurations
                    .HasColumnName("entradavalor");
 
             builder.Property(i => i.DataPagamento)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("date")
                     .HasColumnName("datapagamento");
 
             // 🔥 RELACIONAMENTO EXPLÍCITO (resolve o erro)

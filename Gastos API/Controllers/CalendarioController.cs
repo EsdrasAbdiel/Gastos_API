@@ -47,9 +47,9 @@ namespace Gastos_API.Controllers
         {
             var language = new CultureInfo("pt-BR");
 
-            var despesas = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
+            var resumoFinanceiro = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
 
-            Console.WriteLine(despesas);
+            Console.WriteLine(resumoFinanceiro);
 
             var meses = Enumerable.Range(1, 12)
                 .Select(m => new MesRelacionadoDespesas
@@ -59,8 +59,10 @@ namespace Gastos_API.Controllers
                         language.DateTimeFormat.GetMonthName(m).ToLower()),
                     NomeAbreviado = language.TextInfo.ToTitleCase(
                         language.DateTimeFormat.GetAbbreviatedMonthName(m).ToLower()),
-                    DespesaId = despesas.FirstOrDefault(d => d.Mes == m)?.Id,
-                    StatusCompetenciaMes = _calendarioService.VerificarCompetenciaMesPeloAno(ano, m)
+                    DespesaId = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.Id,
+                    StatusCompetenciaMes = _calendarioService.VerificarCompetenciaMesPeloAno(ano, m),
+                    ValorDespesaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorDespesaTotal ?? 0,
+                    ValorReceitaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorEntradaTotal ?? 0
                 })
                 .ToList();
 

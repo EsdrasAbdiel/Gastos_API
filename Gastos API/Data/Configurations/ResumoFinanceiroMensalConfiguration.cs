@@ -8,7 +8,7 @@ namespace Gastos_API.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<ResumoFinanceiroMensal> builder)
         {
-            builder.ToTable("despesas");
+            builder.ToTable("resumoFinanceiro");
 
             builder.HasKey(x => x.Id);
 
@@ -27,7 +27,8 @@ namespace Gastos_API.Data.Configurations
                    .HasColumnName("valorentradatotal");
 
             builder.Property(x => x.DataInclusao)
-                   .HasColumnName("datainclusao");
+                   .HasColumnName("datainclusao")
+                   .HasColumnType("date");
 
             builder.Property(x => x.Mes)
                    .HasColumnName("mes");
