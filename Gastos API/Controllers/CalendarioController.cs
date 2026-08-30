@@ -1,10 +1,14 @@
 ﻿using Gastos_API.Data;
+using Gastos_API.Enums;
+using Gastos_API.Interfaces;
 using Gastos_API.Models;
+using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Gastos_API.Controllers
 {
@@ -14,20 +18,24 @@ namespace Gastos_API.Controllers
     {
 
         private readonly AppDbContext _context;
+        private readonly ICalendarioService _calendarioService;
 
-        public CalendarioController(AppDbContext context)
+        public CalendarioController(AppDbContext context, ICalendarioService calendarioService, ILogger<CalendarioController> logger)
         {
             _context = context;
+            _calendarioService = calendarioService;
         }
 
         [HttpGet("listar/anos")]
         public async Task<ActionResult<IEnumerable<Ano>>> GetAnos()
         {
+            var anoAtual = DateTime.Now.Year;
             var anos = Enumerable.Range(2025, 6)
                 .Select((ano, index) => new Ano
                 {
                     Id = ano,
-                    AnoDescricao = ano
+                    AnoDescricao = ano,
+                    StatusCompetenciaAno = _calendarioService.VerificarStatusCompetenciaPeriodo(anoAtual, ano)
                 })
                 .ToList();
 
@@ -39,7 +47,9 @@ namespace Gastos_API.Controllers
         {
             var language = new CultureInfo("pt-BR");
 
-            var despesas = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
+            var resumoFinanceiro = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
+
+            Console.WriteLine(resumoFinanceiro);
 
             var meses = Enumerable.Range(1, 12)
                 .Select(m => new MesRelacionadoDespesas
@@ -49,7 +59,10 @@ namespace Gastos_API.Controllers
                         language.DateTimeFormat.GetMonthName(m).ToLower()),
                     NomeAbreviado = language.TextInfo.ToTitleCase(
                         language.DateTimeFormat.GetAbbreviatedMonthName(m).ToLower()),
-                    DespesaId = despesas.FirstOrDefault(d => d.Mes == m)?.Id
+                    DespesaId = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.Id,
+                    StatusCompetenciaMes = _calendarioService.VerificarCompetenciaMesPeloAno(ano, m),
+                    ValorDespesaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorDespesaTotal ?? 0,
+                    ValorReceitaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorEntradaTotal ?? 0
                 })
                 .ToList();
 

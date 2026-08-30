@@ -29,6 +29,10 @@ namespace Gastos_API.Data.Configurations
                    .HasColumnType("numeric(10,2)")
                    .HasColumnName("entradavalor");
 
+            builder.Property(i => i.DataPagamento)
+                    .HasColumnType("date")
+                    .HasColumnName("datapagamento");
+
             // 🔥 RELACIONAMENTO EXPLÍCITO (resolve o erro)
             builder.HasOne(i => i.Despesa)
                    .WithMany(d => d.ItensEntrada)

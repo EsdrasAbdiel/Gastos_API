@@ -14,5 +14,6 @@ namespace Gastos_API.Models
         public Guid DespesaId { get; set; }
         [Column("pago")]
         public bool Pago { get; set; }
+        public DateOnly DataInclusao { get; set; }
     }
 }
