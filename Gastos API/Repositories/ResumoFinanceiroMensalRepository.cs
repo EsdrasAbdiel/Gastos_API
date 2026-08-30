@@ -27,6 +27,12 @@ namespace Gastos_API.Interfaces
                                  .ToListAsync();
         }
 
+        public async Task<ResumoFinanceiroMensal?> BuscarPorAnoEMes(int ano, int mes, Guid usuarioId)
+        {
+            return await _context.ResumoFinanceiroMensal
+                .FirstOrDefaultAsync(x => x.Ano == ano && x.Mes == mes && x.UsuarioId == usuarioId);
+        }
+
         public async Task<ResumoFinanceiroMensal?> BuscarDespesaPorIdAsync(Guid id)
         {
             return await _context.ResumoFinanceiroMensal

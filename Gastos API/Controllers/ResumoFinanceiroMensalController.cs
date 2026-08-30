@@ -3,6 +3,7 @@ using Gastos_API.Models;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Gastos_API.Controllers
 {
@@ -11,6 +12,7 @@ namespace Gastos_API.Controllers
     [ApiController]
     public class ResumoFinanceiroMensalController : ControllerBase
     {
+        private readonly ICalendarioService _calendarioService;
         private readonly IDespesaService _despesaService;
         private readonly IEntradaService _entradaService;
         private readonly IResumoFinanceiroMensalService _resumoFinanceiroMensalService;
@@ -20,12 +22,14 @@ namespace Gastos_API.Controllers
             IDespesaService despesaService, 
             IEntradaService entradaService, 
             IResumoFinanceiroMensalService resumoFinanceiroMensalService,
+            ICalendarioService calendarioService,
             IConfiguration configuration
             )
         {
             _despesaService = despesaService;
             _entradaService = entradaService;
             _resumoFinanceiroMensalService = resumoFinanceiroMensalService;
+            _calendarioService = calendarioService;
             Configuration = configuration;
         }
 
@@ -36,10 +40,11 @@ namespace Gastos_API.Controllers
             return Ok(despesas);
         }
 
-
         [HttpPost("cadastro")]
         public async Task<IActionResult> ReceberDespesas([FromBody] ResumoFinanceiroMensalRequest request)
         {
+            var data = DateTime.Now;
+
             try
             {
                 if (request.Id == Guid.Empty)
@@ -55,7 +60,8 @@ namespace Gastos_API.Controllers
                     DataInclusao = request.DataInclusao,
                     Mes = request.Mes,
                     Ano = request.Ano,
-                    UsuarioId = request.UsuarioId
+                    UsuarioId = request.UsuarioId,
+                    StatusCompetenciaMes = _calendarioService.VerificarStatusCompetenciaPeriodo(data.Month, request.Mes)
                 };
 
                 await _resumoFinanceiroMensalService.AdicionarDespesaAsync(despesa);
@@ -79,6 +85,7 @@ namespace Gastos_API.Controllers
         [HttpGet("buscarDespesa/{id}")]
         public async Task<ActionResult> BuscarPeloId(Guid id)
         {
+            var data = DateTime.Now;
 
             var despesa = await _resumoFinanceiroMensalService.BuscarDespesaPorIdAsync(id);
 
@@ -99,7 +106,8 @@ namespace Gastos_API.Controllers
                 Mes = despesa.Mes,
                 Ano = despesa.Ano,
                 ItensDespesa = itensDespesas,
-                ItensEntrada = itensEntradas
+                ItensEntrada = itensEntradas,
+                StatusCompetenciaMes = _calendarioService.VerificarStatusCompetenciaPeriodo(data.Month, despesa.Mes)
             };
 
             return Ok(despesas);
@@ -108,6 +116,8 @@ namespace Gastos_API.Controllers
         [HttpPut("atualizarDespesa/{id}")]
         public async Task<IActionResult> AtualizarDespesa(Guid id, [FromBody] ResumoFinanceiroMensalRequest request)
         {
+            var data = DateTime.Now;
+
             if (id != request.Id)
                 return BadRequest(new { erro = "ID da URL diferente do corpo.", sucesso = false });
 
@@ -124,6 +134,7 @@ namespace Gastos_API.Controllers
                 despesa.DataInclusao = request.DataInclusao;
                 despesa.Mes = request.Mes;
                 despesa.Ano = request.Ano;
+                despesa.StatusCompetenciaMes = _calendarioService.VerificarStatusCompetenciaPeriodo(data.Month, request.Mes);
 
                 // IDs que vieram do frontend (exceto 0)
                 var idsDespesasDoFrontend = _despesaService.ObterIdsDosItensDespesasExistentes(request.Despesas);
@@ -183,6 +194,7 @@ namespace Gastos_API.Controllers
                         {
                             entradaExistente.EntradaDescricao = itemEntradaReq.EntradaDescricao;
                             entradaExistente.EntradaValor = itemEntradaReq.EntradaValor;
+                            entradaExistente.DataPagamento = itemEntradaReq.DataPagamento;
                         }
                     }
                     else
@@ -191,7 +203,8 @@ namespace Gastos_API.Controllers
                         {
                             Entrada_Id = despesa.Id,
                             EntradaDescricao = itemEntradaReq.EntradaDescricao,
-                            EntradaValor = itemEntradaReq.EntradaValor
+                            EntradaValor = itemEntradaReq.EntradaValor,
+                            DataPagamento = itemEntradaReq.DataPagamento
                         };
 
                         await _entradaService.AdicionarNovaEntradaItemAsync(novoItem);

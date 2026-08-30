@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Gastos_API.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gastos_API.Models
 {
     public class ResumoFinanceiroMensal
     {
+        public StatusCompetencia StatusCompetenciaMes { get; set; }
         [Column("usuarioId")]
         public Guid UsuarioId { get; set; }
         [Column("id")]
@@ -13,7 +15,7 @@ namespace Gastos_API.Models
         [Column("valorentradatotal")]
         public decimal? ValorEntradaTotal { get; set; }
         [Column("datainclusao")]
-        public DateTime DataInclusao { get; set; }
+        public DateOnly DataInclusao { get; set; }
         [Column("mes")]
         public int Mes { get; set; }
         [Column("ano")]

@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
         public decimal? ValorDespesaTotal { get; set; }
         public decimal? ValorEntradaTotal { get; set; }
-        public DateTime DataInclusao { get; set; }
+        public DateOnly DataInclusao { get; set; }
         public int Ano { get; set; }
         public int Mes { get; set; }
         public required List<DespesaItem> Despesas { get; set; }
