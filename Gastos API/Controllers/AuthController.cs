@@ -23,17 +23,7 @@ namespace Gastos_API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { mensagem = "Erro ao efetuar o cadastro", sucesso = false });
 
-            var registro = new Registro
-            {
-                Id = Guid.NewGuid(),
-                DataNascimento = registroRequest.DataNascimento,
-                Nome = registroRequest.Nome,
-                Email = registroRequest.Email,
-                Senha = registroRequest.Senha,
-                ConfirmarSenha = registroRequest.ConfirmarSenha
-            };
-
-            var emailExistente = await _authService.BuscarUsuarioPeloEmailAsync(registroRequest.Email);
+            var emailExistente = await _authService.BuscarUsuarioPeloEmailAsync(registroRequest);
 
             if (emailExistente != null)
                 return BadRequest(new
@@ -42,7 +32,7 @@ namespace Gastos_API.Controllers
                     sucesso = false,
                 });
 
-            var response = await _authService.AdicionarRegistroAsync(registro);
+            var response = await _authService.AdicionarRegistroAsync(registroRequest);
 
             return Ok(new 
             { 
@@ -53,9 +43,9 @@ namespace Gastos_API.Controllers
         }
 
         [HttpPost("buscarUsuario/")]
-        public async Task<ActionResult> BuscarUsuarioPeloEmail([FromBody] Registro registro)
+        public async Task<ActionResult> BuscarUsuarioPeloEmail([FromBody] RegistroRequest registro)
         {
-            var response = await _authService.BuscarUsuarioPeloEmailAsync(registro.Email);
+            var response = await _authService.BuscarUsuarioPeloEmailAsync(registro);
 
             if (response == null)
             {
@@ -66,21 +56,7 @@ namespace Gastos_API.Controllers
                 });
             }
 
-            if (response.Email != registro.Email)
-                return BadRequest(new
-                {
-                    mensagem = "Email incorreto",
-                    sucesso = false
-                });
-            
-            if(response.Senha != registro.Senha)
-                return BadRequest(new
-                {
-                    mensagem = "Senha incorreta",
-                    sucesso = false
-                });
-
-            var token = _authService.GerarToken(registro);
+            var token = _authService.GerarToken(response);
 
             var cookieOptions = new CookieOptions
             {
@@ -106,6 +82,7 @@ namespace Gastos_API.Controllers
             Response.Cookies.Delete("jwt");
             return Ok();
         }
+
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()

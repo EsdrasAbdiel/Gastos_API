@@ -1,6 +1,7 @@
 ﻿using Gastos_API.Data;
 using Gastos_API.Models;
 using Gastos_API.Services;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,17 +22,31 @@ namespace Gastos_API.Repositorios
             _configuration = configuration;
         }
 
-        public async Task<Registro> AdicionarRegistroAsync(Registro registro)
+        public async Task<Registro> AdicionarRegistroAsync(RegistroRequest registro)
         {
-            _context.Registro.Add(registro);
-            await _context.SaveChangesAsync();
-            return registro;
+            var novoRegistro = new Registro
+            {
+                Id = Guid.NewGuid(),
+                DataNascimento = registro.DataNascimento,
+                Nome = registro.Nome,
+                Email = registro.Email,
+                Senha = registro.Senha,
+                ConfirmarSenha = registro.ConfirmarSenha
+            };
+
+            _context.Registro.Add(novoRegistro);
+            var retorno = await _context.SaveChangesAsync();
+
+            if (retorno == 0)
+                throw new Exception("Não foi possivel cadastrar o registro.");
+
+            return novoRegistro;
         }
 
-        public async Task<Registro?> BuscarUsuarioPeloEmailAsync(string email)
+        public async Task<Registro?> BuscarUsuarioPeloEmailAsync(RegistroRequest registro)
         {
             return await _context.Registro
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email == registro.Email);
         }
 
         public string GerarToken(Registro registro)
@@ -44,7 +59,7 @@ namespace Gastos_API.Repositorios
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, registro.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, registro.Email.ToString()),
 
                     new Claim(ClaimTypes.Email, registro.Email)
                 }),
