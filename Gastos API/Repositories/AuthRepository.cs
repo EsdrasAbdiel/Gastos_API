@@ -59,7 +59,7 @@ namespace Gastos_API.Repositorios
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, registro.Email.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, registro.Id.ToString()),
 
                     new Claim(ClaimTypes.Email, registro.Email)
                 }),
