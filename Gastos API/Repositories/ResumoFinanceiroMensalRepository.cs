@@ -33,6 +33,11 @@ namespace Gastos_API.Interfaces
                 .FirstOrDefaultAsync(x => x.Ano == ano && x.Mes == mes && x.UsuarioId == usuarioId);
         }
 
+        public async Task<List<ResumoFinanceiroMensal>> BuscarResumoFinanceiroPeloAno(int ano, Guid usuarioId)
+        {
+            return await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
+        }
+
         public async Task<ResumoFinanceiroMensal?> BuscarDespesaPorIdAsync(Guid id)
         {
             return await _context.ResumoFinanceiroMensal

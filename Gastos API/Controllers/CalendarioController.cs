@@ -27,65 +27,27 @@ namespace Gastos_API.Controllers
         }
 
         [HttpGet("listar/anos")]
-        public async Task<ActionResult<IEnumerable<Ano>>> GetAnos()
+        public ActionResult<IEnumerable<Ano>> ListarAnosAsync()
         {
-            var anoAtual = DateTime.Now.Year;
-            var anos = Enumerable.Range(2025, 6)
-                .Select((ano, index) => new Ano
-                {
-                    Id = ano,
-                    AnoDescricao = ano,
-                    StatusCompetenciaAno = _calendarioService.VerificarStatusCompetenciaPeriodo(anoAtual, ano)
-                })
-                .ToList();
+            var retorno = _calendarioService.ListarAnosAsync();
 
-            return Ok(anos);
+            return Ok(retorno);
+        }
+
+        [HttpGet("listar/mesesComResumoFinanceiro")]
+        public async Task<ActionResult<IEnumerable<MesRelacionadoDespesas>>> ListarMesesComResumoFinanceirosAsync(int ano, Guid usuarioId)
+        {
+            var retorno = await _calendarioService.ListarMesesComResumoFinanceirosAsync(ano, usuarioId);
+
+            return Ok(retorno);
         }
 
         [HttpGet("listar/meses")]
-        public async Task<ActionResult<IEnumerable<MesRelacionadoDespesas>>> GetMeses(int ano, Guid usuarioId)
+        public ActionResult<IEnumerable<Mes>> ListarMesesAsync()
         {
-            var language = new CultureInfo("pt-BR");
+            var retorno = _calendarioService.ListarMesesAsync();
 
-            var resumoFinanceiro = await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
-
-            Console.WriteLine(resumoFinanceiro);
-
-            var meses = Enumerable.Range(1, 12)
-                .Select(m => new MesRelacionadoDespesas
-                {
-                    Id = m,
-                    Nome = language.TextInfo.ToTitleCase(
-                        language.DateTimeFormat.GetMonthName(m).ToLower()),
-                    NomeAbreviado = language.TextInfo.ToTitleCase(
-                        language.DateTimeFormat.GetAbbreviatedMonthName(m).ToLower()),
-                    DespesaId = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.Id,
-                    StatusCompetenciaMes = _calendarioService.VerificarCompetenciaMesPeloAno(ano, m),
-                    ValorDespesaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorDespesaTotal ?? 0,
-                    ValorReceitaTotal = resumoFinanceiro.FirstOrDefault(d => d.Mes == m)?.ValorEntradaTotal ?? 0
-                })
-                .ToList();
-
-            return Ok(meses);
-        }
-
-        [HttpGet("dashboard/meses")]
-        public ActionResult<IEnumerable<Mes>> GetMesesDashboard()
-        {
-            var language = new CultureInfo("pt-BR");
-
-            var meses = Enumerable.Range(1, 12)
-                .Select(m => new Mes
-                {
-                    Id = m,
-                    Nome = language.TextInfo.ToTitleCase(
-                        language.DateTimeFormat.GetMonthName(m).ToLower()),
-                    NomeAbreviado = language.TextInfo.ToTitleCase(
-                        language.DateTimeFormat.GetAbbreviatedMonthName(m).ToLower())
-                })
-                .ToList();
-
-            return Ok(meses);
+            return Ok(retorno);
         }
     }
 }
