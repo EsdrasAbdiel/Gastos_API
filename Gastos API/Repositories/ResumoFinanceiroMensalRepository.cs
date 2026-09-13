@@ -92,5 +92,14 @@ namespace Gastos_API.Interfaces
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<ResumoFinanceiroMensal>> ListarResumoFinanceiroPorUsuarioId(Guid id)
+        {
+            var resumo = await _context.ResumoFinanceiroMensal
+                .Where(x => x.UsuarioId == id)
+                .ToListAsync();
+
+            return resumo;
+        }
     }
 }

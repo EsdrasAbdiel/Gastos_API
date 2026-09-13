@@ -53,5 +53,10 @@ namespace Gastos_API.Interfaces
             await _context.SaveChangesAsync();
             return novaEntradaItem;
         }
+
+        public async Task<List<EntradaItem>> ListarEntradasPorIdsAsync(List<Guid> ids)
+        {
+            return await _context.EntradaItens.Where(e => ids.Contains(e.Entrada_Id)).ToListAsync();
+        }
     }
 }

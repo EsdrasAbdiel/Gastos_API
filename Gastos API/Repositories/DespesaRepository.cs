@@ -55,36 +55,9 @@ namespace Gastos_API.Repositorios
             return novaDespesaItem;
         }
 
-        public async Task<List<Despesa>> ListarAsync()
+        public async Task<List<DespesaItem>> ListarDespesasPorIdsAsync(List<Guid> ids)
         {
-            return await _context.Despesa.Include(d => d.Categoria).Select(d => new Despesa
-            {
-                Id = d.Id,
-                Descricao = d.Descricao,
-                CategoriaId = d.CategoriaId,
-                Categoria = new Categoria
-                {
-                    Id = d.Categoria.Id,
-                    Descricao = d.Categoria.Descricao
-                }
-            }).ToListAsync();
-        }
-
-        public async Task<Despesa> CriarAsync(DespesaRequest despesa)
-        {
-            var novaDespesa = new Despesa
-            {
-                Descricao = despesa.Descricao,
-                CategoriaId = despesa.CategoriaId,
-            };
-
-            _context.Despesa.Add(novaDespesa);
-            var retorno = await _context.SaveChangesAsync();
-
-            if (retorno == 0)
-                throw new Exception("Falha ao cadastrar despesa.");
-
-            return novaDespesa;
+            return await _context.DespesaItens.Where(d => ids.Contains(d.DespesaId)).ToListAsync();
         }
     }
 }
