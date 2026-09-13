@@ -15,6 +15,7 @@ namespace Gastos_API.Controllers
         private readonly IDespesaService _despesaService;
         private readonly IEntradaService _entradaService;
         private readonly ICalendarioService _calendarioService;
+        private readonly IImportacaoExtratoService _importacaoExtratoService;
 
         private readonly AppDbContext _context;
 
@@ -23,12 +24,14 @@ namespace Gastos_API.Controllers
             IDespesaService despesaService,
             IEntradaService entradaService,
             ICalendarioService calendarioService,
+            IImportacaoExtratoService importacaoExtratoService,
             AppDbContext context)
         {
             _resumoFinanceiroMensalService = resumoFinanceiroMensalService;
             _despesaService = despesaService;
             _entradaService = entradaService;
             _calendarioService = calendarioService;
+            _importacaoExtratoService = importacaoExtratoService;
             _context = context;
 
         }
@@ -45,15 +48,7 @@ namespace Gastos_API.Controllers
 
             try
             {
-                using var client = new HttpClient
-                {
-                    Timeout = TimeSpan.FromMinutes(5)
-                };
-
-                using var content = new MultipartFormDataContent();
-                content.Add(new StreamContent(file.OpenReadStream()), "file", file.FileName);
-
-                var response = await client.PostAsync("http://localhost:8000/extrair", content);
+                var response = await _importacaoExtratoService.ConexaoServicoDeImportacaoAsync(file);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -67,20 +62,9 @@ namespace Gastos_API.Controllers
                     });
                 }
 
-                var json = await response.Content.ReadAsStringAsync();
+                var dados = await _importacaoExtratoService.CarregarDadosExtraidosDoPdfAsync(response);
 
-                var dados = JsonSerializer.Deserialize<List<ExtratoItem>>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                Console.WriteLine(JsonSerializer.Serialize(dados, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                }));
-
-
-                if (dados == null || !dados.Any())
+                if (dados == null || dados.Count == 0)
                 {
                     return Ok(new
                     {
@@ -106,8 +90,6 @@ namespace Gastos_API.Controllers
                     })
                     .ToList();
 
-                Console.WriteLine(resultado);
-
                 return Ok(new
                 {
                     sucesso = true,
@@ -126,10 +108,10 @@ namespace Gastos_API.Controllers
             }
         }
 
-        [HttpPost("cadastrarResumoFinanceiro/importacaoExtrato")]
+        [HttpPost]
         public async Task<IActionResult> CadastrarPelaImportacaoDeExtrato([FromBody] ImportacaoExtratoRequest request)
         {
-            if (request?.Extrato == null || !request.Extrato.Any())
+            if (request?.Extrato == null || request.Extrato.Count == 0)
                 return BadRequest(new
                 {
                     sucesso = false,
@@ -189,8 +171,6 @@ namespace Gastos_API.Controllers
 
             var valorEntradaImportado = entradasExtrato.Sum(x => x.EntradaValor);
             var valorDespesaImportado = despesasExtrato.Sum(x => x.Valor);
-
-
 
             try
             {
@@ -309,9 +289,7 @@ namespace Gastos_API.Controllers
         {
             if (usuarioId == Guid.Empty) { return BadRequest(); }
 
-            var extratos = await _context.ImportacaoExtrato
-    .Where(x => x.UsuarioId == usuarioId)
-    .ToListAsync();
+            var extratos = await _context.ImportacaoExtrato.Where(x => x.UsuarioId == usuarioId).ToListAsync();
             return Ok(extratos);
         }
 
