@@ -1,6 +1,7 @@
 ﻿using Gastos_API.Data;
 using Gastos_API.DTOs;
 using Gastos_API.Models;
+using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,43 +12,31 @@ namespace Gastos_API.Controllers
     public class DespesaController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IDespesaService _despesaService;
 
-        public DespesaController(AppDbContext context)
+        public DespesaController(
+            AppDbContext context, 
+            IDespesaService despesaService
+            )
         {
             _context = context;
+            _despesaService = despesaService;
         }
 
         [HttpGet]
-        public async Task<ActionResult> Listar()
+        public ActionResult<List<Despesa>> ListarAsync()
         {
-            var despesas = await _context.Despesa.Include(d => d.Categoria).Select(d => new DespesaDTO
-            {
-                Id = d.Id,
-                Descricao = d.Descricao,
-                CategoriaId = d.CategoriaId,
-                Categoria = new CategoriaDTO
-                {
-                    Id = d.Categoria.Id,
-                    Descricao = d.Categoria.Descricao
-                }
-            }).ToListAsync();
+            var retorno = _despesaService.ListarAsync();
 
-            return Ok(despesas);
+            return Ok(retorno);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Criar(DespesaRequest request)
+        public ActionResult CriarAsync(DespesaRequest request)
         {
-            var despesa = new Despesa
-            {
-                Descricao = request.Descricao,
-                CategoriaId = request.CategoriaId,
-            };
+            var retorno = _despesaService.CriarAsync(request);
 
-            _context.Despesa.Add(despesa);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { sucesso = true, mensagem = "Despesa cadastrada com sucesso"});
+            return Ok(new { sucesso = true, mensagem = "Despesa cadastrada com sucesso", resultado = retorno });
         }
     }
 }

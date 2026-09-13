@@ -12,5 +12,7 @@ namespace Gastos_API.Services
         void RemoverItensDespesaAsync(IEnumerable<DespesaItem> itensDespesa);
         DespesaItem? ObterItemDespesaExistente(IEnumerable<DespesaItem> itensDoBanco, int idItem);
         Task<DespesaItem> AdicionarNovaDespesaItemAsync(DespesaItem novaDespesaItem);
+        Task<List<Despesa>> ListarAsync();
+        Task<Despesa> CriarAsync(DespesaRequest despesa);
     }
 }
