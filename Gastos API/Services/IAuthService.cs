@@ -4,8 +4,8 @@ namespace Gastos_API.Services
 {
     public interface IAuthService
     {
-        Task<Registro> AdicionarRegistroAsync(Registro registro);
-        Task<Registro?> BuscarUsuarioPeloEmailAsync(string email);
+        Task<Registro> AdicionarRegistroAsync(RegistroRequest registro);
+        Task<Registro?> BuscarUsuarioPeloEmailAsync(RegistroRequest registro);
         string GerarToken(Registro registro);
     }
 }

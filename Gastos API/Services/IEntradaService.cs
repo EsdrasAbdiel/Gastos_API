@@ -10,5 +10,6 @@ namespace Gastos_API.Services
         void RemoverItensEntrada(IEnumerable<EntradaItem> itensEntrada);
         EntradaItem? ObterItemEntradaExistente(IEnumerable<EntradaItem> itensDoBanco, int idItem);
         Task<EntradaItem> AdicionarNovaEntradaItemAsync(EntradaItem novaEntradaItem);
+        Task<List<EntradaItem>> ListarEntradasPorIdsAsync(List<Guid> ids);
     }
 }
