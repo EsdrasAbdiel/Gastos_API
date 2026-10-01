@@ -17,7 +17,6 @@ namespace Gastos_API.Repositorios
         public async Task<List<DespesaItem>> BuscarItensDespesaPorIdAsync(Guid id)
         {
             return await _context.DespesaItens.Where(i => i.DespesaId == id).ToListAsync();
-
         }
 
         public List<int> ObterIdsDosItensDespesasExistentes(IEnumerable<DespesaItem> itens)
@@ -55,5 +54,9 @@ namespace Gastos_API.Repositorios
             return novaDespesaItem;
         }
 
+        public async Task<List<DespesaItem>> ListarDespesasPorIdsAsync(List<Guid> ids)
+        {
+            return await _context.DespesaItens.Where(d => ids.Contains(d.DespesaId)).ToListAsync();
+        }
     }
 }

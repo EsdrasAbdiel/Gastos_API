@@ -1,6 +1,7 @@
 using Gastos_API.BackgroundServices;
 using Gastos_API.Data;
 using Gastos_API.Interfaces;
+using Gastos_API.Repositories;
 using Gastos_API.Repositorios;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,33 +52,39 @@ namespace Gastos_API
 
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
+                options.DefaultAuthenticateScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+
+                options.DefaultChallengeScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["jwt"];
-                        return Task.CompletedTask;
-                    }
-                };
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-
+                    ValidateLifetime = true,
                     ValidateIssuer = true,
                     ValidateAudience = true,
 
                     ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Audience"],
 
-                    ValidateLifetime = true
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtKey!)
+                    )
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["jwt"];
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -98,6 +105,9 @@ namespace Gastos_API
             services.AddScoped<IResumoFinanceiroMensalService, ResumoFinanceiroMensalRepository>();
             services.AddScoped<IAuthService, AuthRepository>();
             services.AddScoped<ICalendarioService, CalendarioRepository>();
+            services.AddScoped<IImportacaoExtratoService, ImportacaoExtratoRespository>();
+            services.AddScoped<ICompetenciaService, CompetenciaRepository>();
+            services.AddScoped<IDashboardService, DashboardRepository>();
 
             services.AddHostedService<CompetenciaBackgroundService>();
         }
