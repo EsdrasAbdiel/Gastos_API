@@ -1,5 +1,4 @@
-﻿using Gastos_API.DTOs;
-
+﻿
 namespace Gastos_API.Models
 {
     public class DespesaRequest

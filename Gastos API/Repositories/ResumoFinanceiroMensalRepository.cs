@@ -8,13 +8,24 @@ namespace Gastos_API.Interfaces
     public class ResumoFinanceiroMensalRepository : IResumoFinanceiroMensalService
     {
         private readonly AppDbContext _context;
+        private readonly IDespesaService _despesaService;
+        private readonly IEntradaService _entradaService;
+        private readonly ICompetenciaService _competenciaService;
 
-        public ResumoFinanceiroMensalRepository(AppDbContext context)
+        public ResumoFinanceiroMensalRepository(
+            AppDbContext context,
+            IDespesaService despesaService,
+            IEntradaService entradaService,
+            ICompetenciaService competenciaService
+            )
         {
             _context = context;
+            _despesaService = despesaService;
+            _entradaService = entradaService;
+            _competenciaService = competenciaService;
         }
 
-        public async Task<IEnumerable<ResumoFinanceiroMensal>> BuscarTodasAsDespesasAsync(int ano)
+        public async Task<IEnumerable<ResumoFinanceiroMensal>> ListarResumosFinanceiroAsync(int ano)
         {
             return await _context.ResumoFinanceiroMensal
                                  .Where(d => d.Ano == ano)
@@ -33,11 +44,36 @@ namespace Gastos_API.Interfaces
                 .FirstOrDefaultAsync(x => x.Ano == ano && x.Mes == mes && x.UsuarioId == usuarioId);
         }
 
-        public async Task<ResumoFinanceiroMensal?> BuscarDespesaPorIdAsync(Guid id)
+        public async Task<List<ResumoFinanceiroMensal>> BuscarResumoFinanceiroPeloAno(int ano, Guid usuarioId)
         {
-            return await _context.ResumoFinanceiroMensal
-                                 .Include(x => x.Usuario)
-                                 .FirstOrDefaultAsync(d => d.Id == id);
+            return await _context.ResumoFinanceiroMensal.Where(d => d.UsuarioId == usuarioId && d.Ano == ano).ToListAsync();
+        }
+
+        public async Task<ResumoFinanceiroMensal?> BuscarResumoFinanceiroPorIdAsync(Guid id)
+        {
+            var data = DateTime.Now;
+
+            var despesa = await _context.ResumoFinanceiroMensal.Include(x => x.Usuario).FirstOrDefaultAsync(d => d.Id == id) ?? throw new Exception("Despesa não encontrada.");
+            
+            var itensDespesas = await _despesaService.BuscarItensDespesaPorIdAsync(id);
+
+            var itensEntradas = await _entradaService.BuscarItensEntradaPorIdAsync(id);
+
+            var resumoFinanceiroMensal = new ResumoFinanceiroMensal
+            {
+                Id = despesa.Id,
+                UsuarioId = despesa.UsuarioId,
+                ValorDespesaTotal = despesa.ValorDespesaTotal,
+                ValorEntradaTotal = despesa.ValorEntradaTotal,
+                DataInclusao = despesa.DataInclusao,
+                Mes = despesa.Mes,
+                Ano = despesa.Ano,
+                ItensDespesa = itensDespesas,
+                ItensEntrada = itensEntradas,
+                StatusCompetenciaMes = _competenciaService.VerificarStatusCompetenciaPeriodo(data.Month, despesa.Mes)
+            };
+
+            return resumoFinanceiroMensal;
         }
 
         public async Task<ResumoFinanceiroMensal?> BuscarDespesaComItensPorIdAsync(Guid id)
@@ -55,11 +91,13 @@ namespace Gastos_API.Interfaces
                                  .FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task<ResumoFinanceiroMensal> AdicionarDespesaAsync(ResumoFinanceiroMensal despesa)
+        public async Task<ResumoFinanceiroMensal> CadastrarResumoFinanceiroAsync(ResumoFinanceiroMensalRequest resumoFinanceiroMensal)
         {
-            _context.ResumoFinanceiroMensal.Add(despesa);
+            var retorno = ResumoFinanceiroMensalAsync(resumoFinanceiroMensal);
+
+            _context.ResumoFinanceiroMensal.Add(retorno);
             await _context.SaveChangesAsync();
-            return despesa;
+            return retorno;
         }
 
         public async Task AtualizarDespesaAsync(ResumoFinanceiroMensal despesa)
@@ -86,6 +124,54 @@ namespace Gastos_API.Interfaces
                 _context.ResumoFinanceiroMensal.Remove(despesa);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<ResumoFinanceiroMensal>> ListarResumoFinanceiroPorUsuarioId(Guid id)
+        {
+            var resumo = await _context.ResumoFinanceiroMensal
+                .Where(x => x.UsuarioId == id)
+                .ToListAsync();
+
+            return resumo;
+        }
+
+        public async Task<ResumoFinanceiroMensal> CadastrarResumoFinanceiroImportacaoAsync(ResumoFinanceiroMensal resumoFinanceiroMensal)
+        {
+            _context.ResumoFinanceiroMensal.Add(resumoFinanceiroMensal);
+            await _context.SaveChangesAsync();
+            return resumoFinanceiroMensal;
+        }
+
+        public async Task RemoverDespesaAsync(Guid id)
+        {
+            var resumo = await _context.ResumoFinanceiroMensal
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (resumo == null)
+                return;
+
+            _context.ResumoFinanceiroMensal.Remove(resumo);
+
+            await _context.SaveChangesAsync();
+        }
+
+        private ResumoFinanceiroMensal ResumoFinanceiroMensalAsync(ResumoFinanceiroMensalRequest resumoFinanceiroMensal)
+        {
+            var data = DateTime.Now;
+
+            return new ResumoFinanceiroMensal
+            {
+                Id = resumoFinanceiroMensal.Id,
+                ValorDespesaTotal = resumoFinanceiroMensal.ValorDespesaTotal,
+                ValorEntradaTotal = resumoFinanceiroMensal.ValorEntradaTotal,
+                ItensDespesa = resumoFinanceiroMensal.Despesas,
+                ItensEntrada = resumoFinanceiroMensal.Entradas,
+                DataInclusao = resumoFinanceiroMensal.DataInclusao,
+                Mes = resumoFinanceiroMensal.Mes,
+                Ano = resumoFinanceiroMensal.Ano,
+                UsuarioId = resumoFinanceiroMensal.UsuarioId,
+                StatusCompetenciaMes = _competenciaService.VerificarStatusCompetenciaPeriodo(data.Month, resumoFinanceiroMensal.Mes)
+            };
         }
     }
 }
