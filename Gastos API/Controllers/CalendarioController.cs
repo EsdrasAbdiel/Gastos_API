@@ -26,7 +26,7 @@ namespace Gastos_API.Controllers
             _calendarioService = calendarioService;
         }
 
-        [HttpGet("listar/anos")]
+        [HttpGet("anos")]
         public ActionResult<IEnumerable<Ano>> ListarAnosAsync()
         {
             var retorno = _calendarioService.ListarAnosAsync();
@@ -34,7 +34,7 @@ namespace Gastos_API.Controllers
             return Ok(retorno);
         }
 
-        [HttpGet("listar/mesesComResumoFinanceiro")]
+        [HttpGet("mesesComResumoFinanceiro")]
         public async Task<ActionResult<IEnumerable<MesRelacionadoDespesas>>> ListarMesesComResumoFinanceirosAsync(int ano, Guid usuarioId)
         {
             var retorno = await _calendarioService.ListarMesesComResumoFinanceirosAsync(ano, usuarioId);
@@ -42,7 +42,7 @@ namespace Gastos_API.Controllers
             return Ok(retorno);
         }
 
-        [HttpGet("listar/meses")]
+        [HttpGet("meses")]
         public ActionResult<IEnumerable<Mes>> ListarMesesAsync()
         {
             var retorno = _calendarioService.ListarMesesAsync();

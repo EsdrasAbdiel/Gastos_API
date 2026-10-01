@@ -42,7 +42,7 @@ namespace Gastos_API.Controllers
             });
         }
 
-        [HttpPost("buscarUsuario/")]
+        [HttpPost("registro/buscarUsuarioPeloEmail")]
         public async Task<ActionResult> BuscarUsuarioPeloEmail([FromBody] RegistroRequest registro)
         {
             var response = await _authService.BuscarUsuarioPeloEmailAsync(registro);

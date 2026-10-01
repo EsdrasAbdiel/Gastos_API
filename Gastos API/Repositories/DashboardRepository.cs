@@ -1,5 +1,4 @@
-﻿using Gastos_API.DTOs;
-using Gastos_API.Models;
+﻿using Gastos_API.Models;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,18 +8,15 @@ namespace Gastos_API.Repositories
     public class DashboardRepository : IDashboardService
     {
         private readonly IResumoFinanceiroMensalService _resumoFinanceiroMensalService;
-        private readonly IDashboardService _dashboardService;
         private readonly IDespesaService _despesaService;
         private readonly IEntradaService _entradaService;
         public DashboardRepository(
             IResumoFinanceiroMensalService resumoFinanceiroMensalService,
-            IDashboardService dashboardService,
             IDespesaService despesaService,
             IEntradaService entradaService
             )
         {
             _resumoFinanceiroMensalService = resumoFinanceiroMensalService;
-            _dashboardService = dashboardService;
             _despesaService = despesaService;
             _entradaService = entradaService;
         }

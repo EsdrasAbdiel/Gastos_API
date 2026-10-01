@@ -28,10 +28,10 @@ namespace Gastos_API.BackgroundServices
                 {
                     using var scope = _scopeFactory.CreateScope();
 
-                    var calendarioService =
-                        scope.ServiceProvider.GetRequiredService<ICalendarioService>();
+                    var competenciaService =
+                        scope.ServiceProvider.GetRequiredService<ICompetenciaService>();
 
-                    var statusMes = calendarioService.VerificarCompetenciaMesPeloAno(
+                    var statusMes = competenciaService.VerificarCompetenciaMesPeloAno(
                         agora.Year,
                         agora.Month);
 

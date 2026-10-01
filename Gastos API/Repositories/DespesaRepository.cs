@@ -2,7 +2,6 @@
 using Gastos_API.Models;
 using Gastos_API.Data;
 using Gastos_API.Services;
-using Gastos_API.DTOs;
 
 namespace Gastos_API.Repositorios
 {

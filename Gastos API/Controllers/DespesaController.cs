@@ -1,4 +1,4 @@
-﻿using Gastos_API.Data
+﻿using Gastos_API.Data;
 using Gastos_API.Services;
 using Microsoft.AspNetCore.Mvc;
 

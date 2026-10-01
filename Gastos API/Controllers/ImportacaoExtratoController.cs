@@ -16,10 +16,12 @@ namespace Gastos_API.Controllers
         private readonly IEntradaService _entradaService;
         private readonly ICalendarioService _calendarioService;
         private readonly IImportacaoExtratoService _importacaoExtratoService;
+        private readonly ICompetenciaService _competenciaService;
 
         private readonly AppDbContext _context;
 
         public ImportacaoExtratoController(
+            ICompetenciaService competenciaService,
             IResumoFinanceiroMensalService resumoFinanceiroMensalService,
             IDespesaService despesaService,
             IEntradaService entradaService,
@@ -27,6 +29,7 @@ namespace Gastos_API.Controllers
             IImportacaoExtratoService importacaoExtratoService,
             AppDbContext context)
         {
+            _competenciaService = competenciaService;
             _resumoFinanceiroMensalService = resumoFinanceiroMensalService;
             _despesaService = despesaService;
             _entradaService = entradaService;
@@ -189,10 +192,10 @@ namespace Gastos_API.Controllers
                         DataInclusao = dataAtual,
                         ValorEntradaTotal = valorEntradaImportado,
                         ValorDespesaTotal = valorDespesaImportado,
-                        StatusCompetenciaMes = _calendarioService.VerificarStatusCompetenciaPeriodo(dataAtual.Month, mes)
+                        StatusCompetenciaMes = _competenciaService.VerificarStatusCompetenciaPeriodo(dataAtual.Month, mes)
                     };
 
-                    await _resumoFinanceiroMensalService.AdicionarDespesaAsync(novoResumo);
+                    await _resumoFinanceiroMensalService.CadastrarResumoFinanceiroImportacaoAsync(novoResumo);
 
                     foreach (var entrada in entradasExtrato)
                     {
@@ -236,7 +239,7 @@ namespace Gastos_API.Controllers
                     resumoExistente.DataInclusao;
 
                 resumoExistente.StatusCompetenciaMes =
-                    _calendarioService.VerificarStatusCompetenciaPeriodo(dataAtual.Month, mes);
+                    _competenciaService.VerificarStatusCompetenciaPeriodo(dataAtual.Month, mes);
 
                 foreach (var entrada in entradasExtrato)
                 {
